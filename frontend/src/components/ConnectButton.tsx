@@ -94,7 +94,7 @@ export function Account() {
   );
 }
 
-const truncMiddle = (str: string, len: number) => {
+export const truncMiddle = (str: string, len: number) => {
   if (str.length <= len) {
     return str;
   }

@@ -1,15 +1,25 @@
 "use client";
 import sdk, { FrameContext } from "@farcaster/frame-sdk";
 import { useCallback, useEffect, useState } from "react";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useBlockNumber,
+  useChainId,
+  useConnect,
+  useDisconnect,
+} from "wagmi";
 
-import ConnectButton from "@/components/ConnectButton";
-import Lock from "./Lock";
+import ConnectButton, { truncMiddle } from "@/components/ConnectButton";
+import CreateAccount from "@/components/CreateAccount";
+import Account from "./Account";
+import { registryAddress } from "@/generated";
 
 export default function Demo() {
   const [isSDKLoaded, setSDKLoaded] = useState(false);
   const [context, setContext] = useState<FrameContext>();
   const [isContextOpen, setContextOpen] = useState(false);
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+  const chainId = useChainId({});
 
   const { address } = useAccount();
 
@@ -39,15 +49,39 @@ export default function Demo() {
       <div className="flex flex-col items-center gap-4 ">
         <div className="flex flex-row w-full justify-between items-center gap-4 px-2">
           <h1 className="text-2xl font-bold text-center mb-4 primary-content">
-            Farlinks
+            LinkFar
           </h1>
+          <div className="mb-4">
+            <span>
+              Registry address:{" "}
+              <pre>{truncMiddle(registryAddress[31337], 12)}</pre>
+            </span>
+          </div>
+          <div className="mb-4">
+            <span>
+              <pre>{truncMiddle(registryAddress[31337], 12)}</pre>
+            </span>
+          </div>
+          <div className="mb-4">
+            <span>
+              Chain ID: <pre>{chainId}</pre>
+            </span>
+          </div>
+          <div className="mb-4">
+            <span>
+              Block Number: <pre>{Number(blockNumber)}</pre>
+            </span>
+          </div>
           <div className="mb-4 ">
             <ConnectButton />
           </div>
         </div>
       </div>
       <div className="flex flex-col items-center gap-4">
-        <Lock />
+        <CreateAccount />
+      </div>
+      <div className="flex flex-col items-center gap-4">
+        <Account />
       </div>
 
       <div className="flex flex-col items-center gap-4">
@@ -58,8 +92,9 @@ export default function Demo() {
             className="flex items-center gap-2 transition-colors btn"
           >
             <span
-              className={`transform transition-transform ${isContextOpen ? "rotate-90" : ""
-                }`}
+              className={`transform transition-transform ${
+                isContextOpen ? "rotate-90" : ""
+              }`}
             >
               ➤
             </span>

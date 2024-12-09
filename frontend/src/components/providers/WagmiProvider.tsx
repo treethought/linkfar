@@ -5,15 +5,15 @@ import { base, hardhat, mainnet } from "wagmi/chains";
 import { coinbaseWallet, injected, metaMask } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [base, mainnet],
+  chains: [hardhat],
   transports: {
-    [mainnet.id]: http(),
-    [base.id]: http(),
-    // [hardhat.id]: http("http://127.0.0.1:8545"),
+    //[mainnet.id]: http(),
+    //[base.id]: http(),
+    [hardhat.id]: http(),
   },
   connectors: [
-    frameConnector(),
-    //injected(),
+    // frameConnector(),
+    // injected(),
     coinbaseWallet(),
     metaMask(),
   ],

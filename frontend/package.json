@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@farcaster/frame-sdk": "^0.0.5",
+    "@pinata/ipfs-gateway-tools": "^1.3.0",
     "@tailwindcss/typography": "^0.5.15",
     "@tanstack/react-query": "^5.62.2",
     "@wagmi/cli": "^2.1.18",
