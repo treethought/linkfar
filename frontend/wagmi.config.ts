@@ -8,11 +8,8 @@ export default defineConfig({
     hardhat({
       project: "../",
       deployments: {
-        Lock: {
-          31337: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-        },
         Registry: {
-          31337: "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
+          31337: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
         },
       },
     }),

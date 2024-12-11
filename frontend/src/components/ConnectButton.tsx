@@ -1,13 +1,12 @@
+import { registryAddress } from "@/generated";
 import * as React from "react";
-import { Connector, useConnect } from "wagmi";
-import { disconnect } from "wagmi/actions";
+import { Connector, useChainId, useConnect } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
 
 export default function ConnectButton() {
-  const { disconnect } = useDisconnect();
   const { isConnected } = useAccount();
   if (isConnected) {
-    return <Account />;
+    return <AccountOptions />;
   }
   return <WalletOptions />;
 }
@@ -51,13 +50,14 @@ function WalletOption({
   );
 }
 
-export function Account() {
+export function AccountOptions() {
+  const chainId = useChainId({});
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const { data: ensName } = useEnsName({ address });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName! });
 
-  const shortAddress = truncMiddle(address as string, 6);
+  const shortAddress = truncMiddle(address as string, 12);
 
   if (!address) {
     return <button onClick={() => disconnect()}>Disconnect</button>;
@@ -81,10 +81,24 @@ export function Account() {
         >
           <div>{ensName ? `${ensName} (${shortAddress})` : shortAddress}</div>
         </div>
+
         <ul
           tabIndex={0}
-          className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+          className="dropdown-content menu bg-base-700 bg-pink rounded-box z-[1] w-52 p-2 shadow"
         >
+          <li className="mb-4">
+            <span>
+              Registry address:{" "}
+              {registryAddress[31337] && (
+                <pre>{truncMiddle(registryAddress[31337], 12)}</pre>
+              )}
+            </span>
+          </li>
+          <li className="mb-4">
+            <span>
+              Chain ID: <pre>{JSON.stringify(chainId)}</pre>
+            </span>
+          </li>
           <li>
             <button onClick={() => disconnect()}>Disconnect</button>
           </li>

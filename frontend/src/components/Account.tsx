@@ -1,64 +1,28 @@
-import {
-  accountAbi,
-  useReadAccountUri,
-  useReadRegistryAccounts,
-} from "@/generated";
+import { accountAbi } from "@/generated";
 import { useEffect, useState } from "react";
 import { getAddress, zeroAddress } from "viem";
-import { useAccount, useWriteContract } from "wagmi";
-import { buildIpfsUrl, getCIDJson, uploadAccountData } from "@/lib/pinata";
-import { truncMiddle } from "./ConnectButton";
+import {
+  useAccount,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
+import ConnectButton, { truncMiddle } from "./ConnectButton";
+import { useAccountContract, useAccountData } from "@/hooks/account";
+import CreateAccount from "./CreateAccount";
 type AccountData = {
   Links: Record<string, string>;
 };
 
-function useAccountContract() {
-  const { address } = useAccount();
-  const { data: accountContract } = useReadRegistryAccounts({
-    account: address,
-    args: [address || zeroAddress],
-  });
-  return { accountContract };
-}
-
-function useAccountUri() {
-  const { accountContract } = useAccountContract();
-  const { data: uri, isLoading, error } = useReadAccountUri({
-    address: accountContract,
-    args: [],
-  });
-  return { uri, isLoading, error };
-}
-
 export default function Account() {
   const { isConnected } = useAccount();
-  const { accountContract } = useAccountContract();
 
   if (!isConnected) {
-    return (
-      <div className="flex flex-col justify-center items-center gap-4">
-        <h1>Connect to view account</h1>
-      </div>
-    );
-  }
-
-  if (!accountContract) {
-    return (
-      <div className="flex flex-col justify-center items-center gap-4">
-        <h1>Loading...</h1>
-      </div>
-    );
+    return <ConnectButton />;
   }
 
   return (
     <div className="flex flex-col justify-center items-center gap-4">
-      <h1>Account</h1>
-      <div>
-        <span>
-          Account Contract : {truncMiddle(accountContract, 8)}
-        </span>
-      </div>
-      <br />
       <AccountDataView />
     </div>
   );
@@ -66,62 +30,90 @@ export default function Account() {
 
 function AccountDataView() {
   const { accountContract } = useAccountContract();
-  const { uri } = useAccountUri();
-  const [data, setData] = useState<AccountData | undefined>();
+  const { data, loading, error } = useAccountData();
   const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    if (!uri) {
-      return;
-    }
-    const getData = async () => {
-      console.log("getting data for uri: ", uri);
-      const data = await getCIDJson(uri);
-      setData(data);
-    };
-
-    getData();
-  }, [uri]);
-  if (!accountContract) {
-    return <div>Account Contract not found</div>;
+  if (!accountContract || accountContract === zeroAddress) {
+    return null;
   }
-  return (
-    <div className="flex flex-col justify-center items-center gap-4">
-      <div className="flex flex-row justify-center items-center gap-4">
-        <h2 className="text-xl font-bold">Account Links</h2>
-        <button className="btn" onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? "Done" : "Edit"}
-        </button>
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center gap-4 h-full">
+        <span className="loading loading-lg">Loading</span>
       </div>
-      {isEditing && <AccountForm accountData={data} />}
-      {data?.Links && Object.entries(data?.Links).map(([key, value]) => (
-        <a
-          key={key}
-          href={value}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-primary w-64"
-        >
-          {key}
-        </a>
-      ))}
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-error">
+        <div className="flex-1">
+          <label>Error:</label>
+          {error.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data?.Links) {
+    return (
+      <div className="flex flex-col justify-center items-center gap-4">
+        <div className="flex flex-row justify-center items-center gap-4">
+          <h1>Account Contract</h1>
+          <pre>{truncMiddle(accountContract, 8)}</pre>
+        </div>
+        <AccountForm accountData={data} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col w-full justify-center items-center gap-4 ">
+      {isEditing
+        ? <AccountForm accountData={data} onClose={() => setIsEditing(false)} />
+        : (
+          <div className="flex flex-col gap-4">
+            {data?.Links && Object.entries(data?.Links).map(([key, value]) => (
+              <a
+                key={key}
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-primary w-64"
+              >
+                {key}
+              </a>
+            ))}
+          </div>
+        )}
+      <button className="btn" onClick={() => setIsEditing(!isEditing)}>
+        {isEditing ? "Done" : "Edit"}
+      </button>
     </div>
   );
 }
 
 type FormProps = {
   accountData?: AccountData;
+  onClose?: () => void;
 };
 
 function AccountForm(props: FormProps) {
   const [cid, setCid] = useState<string | null>(null);
-  const [uriUpdated, setUriUpdated] = useState<boolean | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<any | null>(null);
+  const [sent, setSent] = useState(false);
   const { accountContract } = useAccountContract();
-  const { writeContract } = useWriteContract();
+  const { writeContract, data: txHash, isPending } = useWriteContract();
 
-  // Local state for editable account data
+  // useWaitForTransaction to wait for the transaction to be mined
+  const { data: receipt, isLoading: isConfirming, error: txError } =
+    useWaitForTransactionReceipt({
+      hash: txHash, // Pass the transaction hash
+      confirmations: 3,
+    });
+
   const [localAccountData, setLocalAccountData] = useState(
     props.accountData || { Links: {} },
   );
@@ -143,6 +135,27 @@ function AccountForm(props: FormProps) {
     setIsModalOpen(false);
     setCurrentKey("");
     setCurrentValue("");
+  };
+
+  useEffect(() => {
+    if (receipt?.transactionHash) {
+      console.log("transaction mined: ", receipt);
+      props.onClose && props.onClose();
+      return;
+    }
+    if (txError) {
+      console.error("error: ", error);
+      setError(error);
+    }
+  }, [receipt, txError]);
+
+  const handleDeleteItem = () => {
+    setLocalAccountData((prev) => {
+      const updatedLinks = { ...prev.Links };
+      delete updatedLinks[currentKey];
+      return { ...prev, Links: updatedLinks };
+    });
+    closeModal();
   };
 
   const handleSaveModal = () => {
@@ -196,13 +209,15 @@ function AccountForm(props: FormProps) {
       functionName: "setUri",
       args: [uri],
     });
+    setSent(true);
   };
 
-  return (
-    <div className="flex flex-col justify-center items-center gap-4">
-      <h2 className="text-lg font-bold">Edit Account Links</h2>
+  if (!accountContract || accountContract === zeroAddress) {
+    return <CreateAccount />;
+  }
 
-      {/* Show Add First Link Button if localAccountData.Links is empty */}
+  return (
+    <div className="flex flex-col w-full justify-center items-center gap-4 p-4 border border-pink-50">
       {Object.keys(localAccountData.Links).length === 0
         ? (
           <button
@@ -213,7 +228,6 @@ function AccountForm(props: FormProps) {
           </button>
         )
         : (
-          // Render existing links
           Object.entries(localAccountData.Links).map(([key, value]) => (
             <div key={key} className="flex gap-2 items-center w-full">
               <span className="w-1/3 text-sm font-medium">{key}</span>
@@ -229,7 +243,6 @@ function AccountForm(props: FormProps) {
           ))
         )}
 
-      {/* Add Link Button */}
       {Object.keys(localAccountData.Links).length > 0 && (
         <button
           className="btn btn-outline w-full"
@@ -239,13 +252,35 @@ function AccountForm(props: FormProps) {
         </button>
       )}
 
-      {!(uploading || cid) && (
+      {uploading && <span className="loading loading-ring"></span>}
+
+      {(localAccountData.Links && !uploading && !cid) && (
         <button className="btn btn-primary w-full" onClick={upload}>
           Upload
         </button>
       )}
 
-      {cid && !uriUpdated && (
+      {(sent || isConfirming) && <span className="loading loading-bars"></span>}
+
+      {error && (
+        <div className="alert alert-error">
+          <div className="flex-1">
+            <label>Error:</label>
+            {error.message}
+          </div>
+        </div>
+      )}
+
+      {sent && txError && (
+        <div className="alert alert-error">
+          <div className="flex-1">
+            <label>Error:</label>
+            {txError.message}
+          </div>
+        </div>
+      )}
+
+      {!sent && cid && (
         <button
           className="btn btn-accent w-full"
           onClick={() => setUri()}
@@ -254,48 +289,55 @@ function AccountForm(props: FormProps) {
         </button>
       )}
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">
-              {modalMode === "edit" ? "Edit Link" : "Add New Link"}
-            </h3>
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text">Key</span>
-              </label>
-              <input
-                type="text"
-                className="input input-bordered"
-                value={currentKey}
-                onChange={(e) => setCurrentKey(e.target.value)}
-                placeholder="Enter key"
-              />
-            </div>
-            <div className="form-control mt-4">
-              <label className="label">
-                <span className="label-text">Value</span>
-              </label>
-              <input
-                type="text"
-                className="input input-bordered"
-                value={currentValue}
-                onChange={(e) => setCurrentValue(e.target.value)}
-                placeholder="Enter value"
-              />
-            </div>
-            <div className="modal-action">
-              <button className="btn btn-primary" onClick={handleSaveModal}>
-                Save
-              </button>
-              <button className="btn btn-secondary" onClick={closeModal}>
-                Cancel
-              </button>
+      {/* Modal (Always rendered, controlled visibility) */}
+      <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">
+            {modalMode === "edit" ? "Edit Link" : "Add New Link"}
+          </h3>
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text">Key</span>
+            </label>
+            <input
+              type="text"
+              className="input input-bordered"
+              value={currentKey}
+              onChange={(e) => setCurrentKey(e.target.value)}
+              placeholder="Enter key"
+            />
+          </div>
+          <div className="form-control mt-4">
+            <label className="label">
+              <span className="label-text">Value</span>
+            </label>
+            <input
+              type="text"
+              className="input input-bordered"
+              value={currentValue}
+              onChange={(e) => setCurrentValue(e.target.value)}
+              placeholder="Enter value"
+            />
+          </div>
+          <div className="modal-action">
+            <div className="flex flex-row gap-1 justify-end">
+              <div>
+                <button className="btn btn-error" onClick={handleDeleteItem}>
+                  Delete
+                </button>
+              </div>
+              <div>
+                <button className="btn btn-primary" onClick={handleSaveModal}>
+                  Save
+                </button>
+                <button className="btn btn-secondary" onClick={closeModal}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

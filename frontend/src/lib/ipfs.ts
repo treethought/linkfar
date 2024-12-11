@@ -5,6 +5,7 @@ const gateway = process.env.NEXT_PUBLIC_PINATA_GATEWAY || "ipfs.io";
 
 export const getCIDJson = async (uri: string) => {
   const url = toGatewayUrl(uri);
+  console.log("Fetching CID JSON", url);
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Failed to fetch ${uri}`);
@@ -21,6 +22,7 @@ export const uploadAccountData = async (
     pinataContent: data,
   };
   const bodyJson = JSON.stringify(body);
+  console.log("Uploading data to Pinata", bodyJson);
   const res = await fetch(
     "https://api.pinata.cloud/pinning/pinJSONToIPFS",
     {
@@ -33,6 +35,7 @@ export const uploadAccountData = async (
     },
   );
   const json = await res.json();
+  console.log("Uploaded data to Pinata", json);
   const { IpfsHash } = json;
   return IpfsHash;
 };
