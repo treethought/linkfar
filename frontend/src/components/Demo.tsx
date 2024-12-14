@@ -1,13 +1,12 @@
 "use client";
 import sdk, { FrameContext } from "@farcaster/frame-sdk";
-import { useCallback, useEffect, useState } from "react";
-import { useBlockNumber, useChainId } from "wagmi";
+import { useEffect, useState } from "react";
+import { useAccount, useBlockNumber, useChainId, useEnsName } from "wagmi";
 
-import ConnectButton, { truncMiddle } from "@/components/ConnectButton";
+import ConnectButton from "@/components/ConnectButton";
 import CreateAccount from "@/components/CreateAccount";
 import Account from "./Account";
-import { registryAddress } from "@/generated";
-import { useAccountContract } from "@/hooks/account";
+import { useProfile } from "@/hooks/profile";
 
 export default function Demo() {
   const [isSDKLoaded, setSDKLoaded] = useState(false);
@@ -15,9 +14,11 @@ export default function Demo() {
   const [isContextOpen, setContextOpen] = useState(false);
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const chainId = useChainId({});
-  const { accountContract } = useAccountContract();
+  const { address } = useAccount();
+  const { profile } = useProfile(address || "");
 
   useEffect(() => {
+    console.log("sdk effect", blockNumber);
     const load = async () => {
       setContext(await sdk.context);
       sdk.actions.ready();
@@ -41,9 +42,9 @@ export default function Demo() {
         </div>
       </div>
       <div className="flex flex-col items-center gap-4">
-        {!accountContract && <CreateAccount />}
+        {!profile && <CreateAccount />}
       </div>
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 w-full">
         <Account />
       </div>
     </div>

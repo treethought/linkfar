@@ -1,4 +1,4 @@
-import { registryAddress } from "@/generated";
+import { linkFarAddress } from "@/generated";
 import * as React from "react";
 import { Connector, useChainId, useConnect } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
@@ -33,6 +33,7 @@ function WalletOption({
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
+    console.log("connector effect", connector);
     (async () => {
       const provider = await connector.getProvider();
       setReady(!!provider);
@@ -89,8 +90,8 @@ export function AccountOptions() {
           <li className="mb-4">
             <span>
               Registry address:{" "}
-              {registryAddress[31337] && (
-                <pre>{truncMiddle(registryAddress[31337], 12)}</pre>
+              {linkFarAddress[31337] && (
+                <pre>{truncMiddle(linkFarAddress[31337], 12)}</pre>
               )}
             </span>
           </li>

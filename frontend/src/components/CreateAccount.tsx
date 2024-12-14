@@ -1,13 +1,13 @@
-import { useWriteRegistryCreateAccount } from "@/generated";
+import { useWriteLinkFarMint } from "@/generated";
 import { useAccount } from "wagmi";
 
 export default function CreateAccount() {
   const { isConnected } = useAccount();
-  const { writeContract } = useWriteRegistryCreateAccount();
+  const { writeContract } = useWriteLinkFarMint();
   const createAccount = () => {
     console.log("creating account");
     writeContract({
-      args: [],
+      args: ["test"],
     });
   };
 

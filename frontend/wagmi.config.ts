@@ -8,8 +8,8 @@ export default defineConfig({
     hardhat({
       project: "../",
       deployments: {
-        Registry: {
-          31337: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
+        LinkFar: {
+          31337: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
         },
       },
     }),

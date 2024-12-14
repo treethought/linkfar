@@ -3,11 +3,11 @@
 
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
+const LinkFarModule = buildModule("LinkFarModule", (m) => {
+  const owner = m.getAccount(0);
+  const linkFar = m.contract("LinkFar", [owner], {});
 
-const AccountModule = buildModule("AccountModule", (m) => {
-  const account = m.contract("Account", [], {});
-
-  return { account };
+  return { linkFar };
 });
 
-export default AccountModule;
+export default LinkFarModule;
