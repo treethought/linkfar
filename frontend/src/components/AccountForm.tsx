@@ -9,32 +9,12 @@ import {
 import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
 import ConnectButton, { truncMiddle } from "./ConnectButton";
 import CreateAccount from "./CreateAccount";
-import { useProfile } from "@/hooks/profile";
+import { AccountData, useProfile } from "@/hooks/profile";
 import { useWriteLinkFarUpdateProfile } from "@/generated";
 
 type FormProps = {
   accountData?: AccountData;
   onClose?: () => void;
-};
-
-type AccountData = {
-  Links: Record<string, string>;
-};
-
-type Attribute = {
-  display_type: string;
-  trait_type: string;
-  value: string;
-};
-
-type NftMetada = {
-  name: string;
-  description: string;
-  image: string;
-  image_data: string;
-  attributes: Record<string, string>;
-  background_color: string;
-  animation_url: string;
 };
 
 export function AccountForm(props: FormProps) {
@@ -55,9 +35,7 @@ export function AccountForm(props: FormProps) {
       confirmations: 1,
     });
 
-  const [localAccountData, setLocalAccountData] = useState(
-    props.accountData || { Links: {} },
-  );
+  const [localAccountData, setLocalAccountData] = useState<AccountData>({});
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,7 +71,7 @@ export function AccountForm(props: FormProps) {
 
   const handleDeleteItem = () => {
     setLocalAccountData((prev) => {
-      const updatedLinks = { ...prev.Links };
+      const updatedLinks = { ...prev?.properties };
       delete updatedLinks[currentKey];
       return { ...prev, Links: updatedLinks };
     });
@@ -102,14 +80,14 @@ export function AccountForm(props: FormProps) {
 
   const handleSaveModal = () => {
     setLocalAccountData((prev) => {
-      const updatedLinks = { ...prev.Links };
+      const updatedLinks = { ...prev.properties };
       if (modalMode === "edit") {
         delete updatedLinks[currentKey];
         updatedLinks[currentKey] = currentValue;
       } else if (modalMode === "add") {
         updatedLinks[currentKey] = currentValue;
       }
-      return { ...prev, Links: updatedLinks };
+      return { ...prev, properties: updatedLinks };
     });
     closeModal();
   };
@@ -158,7 +136,7 @@ export function AccountForm(props: FormProps) {
 
   return (
     <div className="flex flex-col w-full justify-center items-center gap-4 p-4 border border-pink-50">
-      {Object.keys(localAccountData.Links).length === 0
+      {!(localAccountData?.properties)
         ? (
           <button
             className="btn btn-primary"
@@ -168,7 +146,7 @@ export function AccountForm(props: FormProps) {
           </button>
         )
         : (
-          Object.entries(localAccountData.Links).map(([key, value]) => (
+          Object.entries(localAccountData.properties).map(([key, value]) => (
             <div key={key} className="flex gap-2 items-center w-full">
               <span className="w-1/3 text-sm font-medium">{key}</span>
               <span className="grow">{value}</span>
@@ -183,7 +161,7 @@ export function AccountForm(props: FormProps) {
           ))
         )}
 
-      {Object.keys(localAccountData.Links).length > 0 && (
+      {localAccountData.properties && (
         <button
           className="btn btn-outline w-full"
           onClick={() => openModal("add")}
@@ -194,7 +172,7 @@ export function AccountForm(props: FormProps) {
 
       {uploading && <span className="loading loading-ring"></span>}
 
-      {(localAccountData.Links && !uploading && !cid) && (
+      {(localAccountData.properties && !uploading && !cid) && (
         <button className="btn btn-primary w-full" onClick={upload}>
           Upload
         </button>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { zeroAddress } from "viem";
 import { useAccount } from "wagmi";
-import ConnectButton, { truncMiddle } from "./ConnectButton";
+import ConnectButton from "./ConnectButton";
 import { useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
 import CreateAccount from "./CreateAccount";
@@ -55,7 +55,7 @@ function ProfileDataView() {
     return <CreateAccount />;
   }
 
-  if (!data?.Links) {
+  if (!data?.properties) {
     return (
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="flex flex-row justify-center items-center gap-4">
@@ -71,19 +71,25 @@ function ProfileDataView() {
       {isEditing
         ? <AccountForm accountData={data} onClose={() => setIsEditing(false)} />
         : (
+          <>
+            <div className="flex flex-row justify-center items-center gap-4">
+              <h1>{data?.name || address || ""}</h1>
+            </div>
           <div className="flex flex-col gap-4">
-            {data?.Links && Object.entries(data?.Links).map(([key, value]) => (
-              <a
-                key={key}
-                href={value}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-primary w-64"
-              >
-                {key}
-              </a>
-            ))}
+            {data?.properties &&
+              Object.entries(data?.properties).map(([key, value]) => (
+                <a
+                  key={key}
+                  href={value}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-primary w-64"
+                >
+                  {key}
+                </a>
+              ))}
           </div>
+          </>
         )}
       <button className="btn" onClick={() => setIsEditing(!isEditing)}>
         {isEditing ? "Done" : "Edit"}
