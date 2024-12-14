@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "genny frame",
-  description: "",
+  title: "linkfar",
+  description: "social link tool for web3",
 };
 
 export default function RootLayout({
@@ -26,7 +26,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="luxury">
-
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-base-100`}
       >

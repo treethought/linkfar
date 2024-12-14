@@ -21,7 +21,6 @@ export function frameConnector() {
     },
     async connect({ chainId } = {}) {
       const provider = await this.getProvider();
-      if (!provider) throw new Error("No provider");
       const accounts = await provider.request({
         method: "eth_requestAccounts",
       });
@@ -55,10 +54,6 @@ export function frameConnector() {
     },
     async disconnect() {
       const provider = await this.getProvider();
-      if (!provider) {
-        connected = false;
-        return;
-      }
 
       if (accountsChanged) {
         // @ts-expect-error - provider type is stricter
@@ -81,7 +76,6 @@ export function frameConnector() {
     async getAccounts() {
       if (!connected) throw new Error("Not connected");
       const provider = await this.getProvider();
-      if (!provider) throw new Error("No provider");
       const accounts = await provider.request({
         method: "eth_requestAccounts",
       });
@@ -89,7 +83,6 @@ export function frameConnector() {
     },
     async getChainId() {
       const provider = await this.getProvider();
-      if (!provider) throw new Error("No provider");
       const hexChainId = await provider.request({ method: "eth_chainId" });
       return fromHex(hexChainId, "number");
     },
@@ -103,7 +96,6 @@ export function frameConnector() {
     },
     async switchChain({ chainId }) {
       const provider = await this.getProvider();
-      if (!provider) throw new Error("No provider");
       const chain = config.chains.find((x) => x.id === chainId);
       if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
 

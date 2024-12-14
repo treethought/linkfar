@@ -11,8 +11,8 @@ import { useProfile } from "@/hooks/profile";
 export default function Demo() {
   const [isSDKLoaded, setSDKLoaded] = useState(false);
   const [, setContext] = useState<FrameContext>();
-  const { address } = useAccount();
-  const { profile } = useProfile(address || "");
+  const { address, isConnected } = useAccount();
+  const { hasProfile } = useProfile(address || "");
 
   useEffect(() => {
     const load = async () => {
@@ -32,16 +32,38 @@ export default function Demo() {
           <h1 className="text-2xl font-bold text-center mb-4 primary-content">
             LinkFar
           </h1>
-          <div className="mb-4 ">
-            <ConnectButton />
-          </div>
+          {isConnected && (
+            <div className="mb-4 ">
+              <ConnectButton />
+            </div>
+          )}
         </div>
       </div>
-      <div className="flex flex-col items-center gap-4">
-        {!profile && <CreateAccount />}
-      </div>
       <div className="flex flex-col items-center gap-4 w-full">
-        <Account />
+        {(!hasProfile) ? <Landing /> : <Account />}
+      </div>
+    </div>
+  );
+}
+
+function Landing() {
+  const { address, isConnected } = useAccount();
+  const { hasProfile } = useProfile(address || "");
+  return (
+    <div className="w-full h-screen mx-auto bg-base-100 py-4 px-1">
+      <div className="hero min-h-[60vh] bg-gradient-to-r">
+        <div className="hero-content text-center">
+          <div className="max-w-md">
+            <h1 className="text-5xl font-bold">LinkFar</h1>
+            <p className="py-4 text-lg">
+              Bring your links to Farcaster
+            </p>
+            <div className="mt-4 flex flex-row justify-center">
+              {!isConnected && <ConnectButton />}
+              {isConnected && !hasProfile && <CreateAccount />}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

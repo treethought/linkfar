@@ -27,7 +27,8 @@ export function useProfile(address?: string) {
   const { data: profile, isLoading, error } = useReadLinkFarGetProfile({
     args: [getAddress(address)],
   });
-  return { profile, isLoading, error };
+  const hasProfile = profile && profile.owner && profile.owner !== zeroAddress;
+  return { profile, hasProfile, isLoading, error };
 }
 
 export function useProfileUri(address: string) {

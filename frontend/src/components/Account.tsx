@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { zeroAddress } from "viem";
 import { useAccount, useEnsName } from "wagmi";
-import ConnectButton from "./ConnectButton";
 import { useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
-import CreateAccount from "./CreateAccount";
 
 export default function Account() {
   const { isConnected } = useAccount();
 
   if (!isConnected) {
-    return <ConnectButton />;
+    return null;
   }
 
   return (
@@ -23,7 +21,7 @@ export default function Account() {
 function ProfileDataView() {
   const { address } = useAccount();
   const { profile, isLoading, error } = useProfile(address);
-  const { data: ensName } = useEnsName({ address });
+  const { data: ensName } = useEnsName({ address, chainId: 1 });
   const { data, loading: dataLoading } = useAccountData(
     address || zeroAddress,
   );
@@ -65,10 +63,6 @@ function ProfileDataView() {
     );
   }
 
-  if (!profile || profile.owner === zeroAddress) {
-    return <CreateAccount />;
-  }
-
   if (!data?.properties) {
     return (
       <div className="flex flex-col justify-center items-center gap-4">
@@ -88,21 +82,25 @@ function ProfileDataView() {
         : (
           <>
             <div className="flex flex-col justify-center items-center gap-4">
-              <h1>{name()}</h1>
-              <article className="prose">{data?.description}</article>
+              <article className="prose">
+                <h2>{name()}</h2>
+                <p>{data?.description}</p>
+              </article>
             </div>
             <div className="flex flex-col gap-4">
               {data?.properties &&
                 Object.entries(data?.properties).map(([key, value]) => (
-                  <a
-                    key={key}
-                    href={value}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-primary w-64"
-                  >
-                    {key}
-                  </a>
+                  value && (
+                    <a
+                      key={key}
+                      href={value}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn btn-primary w-64"
+                    >
+                      {key}
+                    </a>
+                  )
                 ))}
             </div>
           </>

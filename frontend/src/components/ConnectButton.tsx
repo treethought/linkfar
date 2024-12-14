@@ -1,14 +1,16 @@
 import { linkFarAddress } from "@/generated";
+import { ConnectKitButton } from "connectkit";
 import * as React from "react";
-import { Connector, useChainId, useConnect } from "wagmi";
+import { useChainId } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
 
 export default function ConnectButton() {
   const { isConnected } = useAccount();
+
   if (isConnected) {
     return <AccountOptions />;
   }
-  return <WalletOptions />;
+  return <ConnectKitButton />;
 }
 
 const contractAddress = (chainId: number) => {
@@ -16,52 +18,12 @@ const contractAddress = (chainId: number) => {
   return linkFarAddress[c];
 };
 
-function WalletOptions() {
-  const { connectors, connect } = useConnect();
-
-  return connectors.map((connector) => (
-    <WalletOption
-      key={connector.uid}
-      connector={connector}
-      onClick={() => connect({ connector })}
-    />
-  ));
-}
-
-function WalletOption({
-  connector,
-  onClick,
-}: {
-  connector: Connector;
-  onClick: () => void;
-}) {
-  const [ready, setReady] = React.useState(false);
-
-  React.useEffect(() => {
-    console.log("connector effect", connector);
-    (async () => {
-      const provider = await connector.getProvider();
-      setReady(!!provider);
-    })();
-  }, [connector]);
-
-  return (
-    <button
-      className="btn btn-sm btn-outline text-primary"
-      disabled={!ready}
-      onClick={onClick}
-    >
-      {connector.name}
-    </button>
-  );
-}
-
 export function AccountOptions() {
   const chainId = useChainId({});
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
-  const { data: ensName } = useEnsName({ address });
-  const { data: ensAvatar } = useEnsAvatar({ name: ensName! });
+  const { data: ensName } = useEnsName({ address, chainId: 1 });
+  const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
 
   const shortAddress = truncMiddle(address as string, 12);
 
@@ -74,7 +36,7 @@ export function AccountOptions() {
       {ensAvatar &&
         (
           <div className="avatar">
-            <div className="w-12 rounded-full">
+            <div className="w-10 rounded-full">
               <img src={ensAvatar} alt="ens avatar" />
             </div>
           </div>
@@ -83,9 +45,9 @@ export function AccountOptions() {
         <div
           tabIndex={0}
           role="button"
-          className="btn btn-sm btn-outline text-primary m-1"
+          className="btn btn-sm btn-outline  text-primary m-1"
         >
-          <div>{ensName ? `${ensName} (${shortAddress})` : shortAddress}</div>
+          <div>{ensName ? ensName : shortAddress}</div>
         </div>
 
         <ul
@@ -95,7 +57,7 @@ export function AccountOptions() {
           <li className="mb-4">
             <span>
               Contract address:{" "}
-                <pre>{truncMiddle(contractAddress(chainId)!, 12)}</pre>
+              <pre>{truncMiddle(contractAddress(chainId)!, 12)}</pre>
             </span>
           </li>
           <li className="mb-4">

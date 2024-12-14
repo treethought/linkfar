@@ -1,20 +1,24 @@
-import { frameConnector } from "@/lib/connector";
+// import { frameConnector } from "@/lib/connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { baseSepolia, hardhat } from "wagmi/chains";
-import { coinbaseWallet, injected, metaMask } from "wagmi/connectors";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
-export const config = createConfig({
+const ckConfig = getDefaultConfig({
+  appName: "LinkFar",
   chains: [hardhat, baseSepolia],
   transports: {
     [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
+  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
+});
+
+export const config = createConfig({
+  ...ckConfig,
   connectors: [
-    frameConnector(),
-    coinbaseWallet(),
-    injected(),
-    metaMask(),
+    // frameConnector(),
+    ...ckConfig.connectors ?? [],
   ],
 });
 
@@ -24,7 +28,13 @@ export default function Provider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ConnectKitProvider
+          theme="midnight"
+          mode="dark"
+          options={{ embedGoogleFonts: true }}
+        >
+          {children}
+        </ConnectKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
