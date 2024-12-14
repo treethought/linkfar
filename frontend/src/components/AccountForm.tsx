@@ -24,20 +24,21 @@ export function AccountForm(props: FormProps) {
   const [sent, setSent] = useState(false);
   const { address } = useAccount();
   const { profile } = useProfile(address);
-  // const { writeContract, data: txHash, isPending } = useWriteContract();
   const { writeContract, data: txHash, isPending } =
     useWriteLinkFarUpdateProfile();
 
-  // useWaitForTransaction to wait for the transaction to be mined
   const { data: receipt, isLoading: isConfirming, error: txError } =
     useWaitForTransactionReceipt({
-      hash: txHash, // Pass the transaction hash
+      hash: txHash,
       confirmations: 1,
     });
 
-  const [localAccountData, setLocalAccountData] = useState<AccountData>({});
+  const [localAccountData, setLocalAccountData] = useState<AccountData>({
+    name: props.accountData?.name || "",
+    description: props.accountData?.description || "",
+    properties: props.accountData?.properties || {},
+  });
 
-  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [currentKey, setCurrentKey] = useState<string>("");
@@ -57,9 +58,7 @@ export function AccountForm(props: FormProps) {
   };
 
   useEffect(() => {
-    console.log("receipt: effect", receipt);
     if (receipt?.transactionHash) {
-      console.log("transaction mined: ", receipt);
       props.onClose && props.onClose();
       return;
     }
@@ -71,23 +70,23 @@ export function AccountForm(props: FormProps) {
 
   const handleDeleteItem = () => {
     setLocalAccountData((prev) => {
-      const updatedLinks = { ...prev?.properties };
-      delete updatedLinks[currentKey];
-      return { ...prev, Links: updatedLinks };
+      const updatedProperties = { ...prev.properties };
+      delete updatedProperties[currentKey];
+      return { ...prev, properties: updatedProperties };
     });
     closeModal();
   };
 
   const handleSaveModal = () => {
     setLocalAccountData((prev) => {
-      const updatedLinks = { ...prev.properties };
+      const updatedProperties = { ...prev.properties };
       if (modalMode === "edit") {
-        delete updatedLinks[currentKey];
-        updatedLinks[currentKey] = currentValue;
+        delete updatedProperties[currentKey];
+        updatedProperties[currentKey] = currentValue;
       } else if (modalMode === "add") {
-        updatedLinks[currentKey] = currentValue;
+        updatedProperties[currentKey] = currentValue;
       }
-      return { ...prev, properties: updatedLinks };
+      return { ...prev, properties: updatedProperties };
     });
     closeModal();
   };
@@ -98,7 +97,8 @@ export function AccountForm(props: FormProps) {
     setError(null);
     try {
       const metadata = {
-        name: "Account Data",
+        name: localAccountData.name || address,
+        // description: localAccountData.description || "",
         keyvalues: {
           owner: profile?.owner || "",
         },
@@ -124,7 +124,6 @@ export function AccountForm(props: FormProps) {
     console.log("setting uri: ", uri);
 
     writeContract({
-      // address: getAddress(accountContract || zeroAddress),
       args: [uri],
     });
     setSent(true);
@@ -136,6 +135,42 @@ export function AccountForm(props: FormProps) {
 
   return (
     <div className="flex flex-col w-full justify-center items-center gap-4 p-4 border border-pink-50">
+      {/* Name Field */}
+      <div className="form-control w-full">
+        <label className="label">
+          <span className="label-text font-bold text-lg">Account Name</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered"
+          value={localAccountData.name}
+          onChange={(e) =>
+            setLocalAccountData((prev) => ({
+              ...prev,
+              name: e.target.value,
+            }))}
+          placeholder="Enter account name"
+        />
+      </div>
+
+      {/* Description Field */}
+      <div className="form-control w-full">
+        <label className="label">
+          <span className="label-text font-medium text-md">Description</span>
+        </label>
+        <textarea
+          className="textarea textarea-bordered"
+          value={localAccountData.description}
+          onChange={(e) =>
+            setLocalAccountData((prev) => ({
+              ...prev,
+              description: e.target.value,
+            }))}
+          placeholder="Enter account description"
+        />
+      </div>
+
+      {/* Properties */}
       {!(localAccountData?.properties)
         ? (
           <button
@@ -207,7 +242,7 @@ export function AccountForm(props: FormProps) {
         </button>
       )}
 
-      {/* Modal (Always rendered, controlled visibility) */}
+      {/* Modal */}
       <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
         <div className="modal-box">
           <h3 className="font-bold text-lg">

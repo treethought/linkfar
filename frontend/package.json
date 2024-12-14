@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "yarn wagmi generate && next dev",
+    "build": "yarn wagmi generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
