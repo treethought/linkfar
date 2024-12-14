@@ -7,7 +7,7 @@ import { AccountForm } from "./AccountForm";
 import CreateAccount from "./CreateAccount";
 
 export default function Account() {
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
 
   if (!isConnected) {
     return <ConnectButton />;
@@ -24,7 +24,7 @@ function ProfileDataView() {
   const { address } = useAccount();
   const { profile, isLoading, error } = useProfile(address);
   const { data: ensName } = useEnsName({ address });
-  const { data, loading: dataLoading, refetch } = useAccountData(
+  const { data, loading: dataLoading } = useAccountData(
     address || zeroAddress,
   );
 
@@ -75,7 +75,7 @@ function ProfileDataView() {
         <div className="flex flex-row justify-center items-center gap-4">
           <h1>Account Form</h1>
         </div>
-        <AccountForm accountData={data} onClose={refetch} />
+        <AccountForm accountData={data} />
       </div>
     );
   }

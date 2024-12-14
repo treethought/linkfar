@@ -11,6 +11,11 @@ export default function ConnectButton() {
   return <WalletOptions />;
 }
 
+const contractAddress = (chainId: number) => {
+  const c = chainId as keyof typeof linkFarAddress;
+  return linkFarAddress[c];
+};
+
 function WalletOptions() {
   const { connectors, connect } = useConnect();
 
@@ -70,7 +75,7 @@ export function AccountOptions() {
         (
           <div className="avatar">
             <div className="w-12 rounded-full">
-              <img src={ensAvatar} />
+              <img src={ensAvatar} alt="ens avatar" />
             </div>
           </div>
         )}
@@ -89,10 +94,8 @@ export function AccountOptions() {
         >
           <li className="mb-4">
             <span>
-              Registry address:{" "}
-              {linkFarAddress[chainId] && (
-                <pre>{truncMiddle(linkFarAddress[chainId], 12)}</pre>
-              )}
+              Contract address:{" "}
+                <pre>{truncMiddle(contractAddress(chainId)!, 12)}</pre>
             </span>
           </li>
           <li className="mb-4">

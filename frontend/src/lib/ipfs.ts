@@ -14,7 +14,7 @@ export const getCIDJson = async (uri: string) => {
 };
 
 export const uploadAccountData = async (
-  data: any,
+  data: object,
   meta: object,
 ) => {
   const body = {

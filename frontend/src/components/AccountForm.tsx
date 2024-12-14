@@ -1,13 +1,7 @@
-import { linkFarAbi } from "@/generated";
 import { useEffect, useState } from "react";
-import { getAddress, zeroAddress } from "viem";
-import {
-  useAccount,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
+import { zeroAddress } from "viem";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
-import ConnectButton, { truncMiddle } from "./ConnectButton";
 import CreateAccount from "./CreateAccount";
 import { AccountData, useProfile } from "@/hooks/profile";
 import { useWriteLinkFarUpdateProfile } from "@/generated";
@@ -20,18 +14,19 @@ type FormProps = {
 export function AccountForm(props: FormProps) {
   const [cid, setCid] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<any | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [sent, setSent] = useState(false);
   const { address } = useAccount();
   const { profile } = useProfile(address);
   const { writeContract, data: txHash, isPending } =
     useWriteLinkFarUpdateProfile();
 
-  const { data: receipt, isLoading: isConfirming, error: txError } =
-    useWaitForTransactionReceipt({
-      hash: txHash,
-      confirmations: 1,
-    });
+  const { onClose } = props;
+
+  const { data: receipt, error: txError } = useWaitForTransactionReceipt({
+    hash: txHash,
+    confirmations: 1,
+  });
 
   const [localAccountData, setLocalAccountData] = useState<AccountData>({
     name: props.accountData?.name || "",
@@ -59,14 +54,14 @@ export function AccountForm(props: FormProps) {
 
   useEffect(() => {
     if (receipt?.transactionHash) {
-      props.onClose && props.onClose();
+      if (onClose) onClose();
       return;
     }
     if (txError) {
-      console.error("error: ", error);
-      setError(error);
+      console.error("error: ", txError);
+      setError(txError);
     }
-  }, [receipt, txError]);
+  }, [receipt, txError, onClose]);
 
   const handleDeleteItem = () => {
     setLocalAccountData((prev) => {
@@ -109,7 +104,11 @@ export function AccountForm(props: FormProps) {
       setCid(cidRes);
     } catch (e) {
       console.error("error uploading data: ", e);
-      setError(e);
+      if (e instanceof Error) {
+        setError(e);
+      } else {
+        setError(new Error("Failed to upload data"));
+      }
     } finally {
       setUploading(false);
     }

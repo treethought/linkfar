@@ -1,20 +1,19 @@
 import { frameConnector } from "@/lib/connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
-import { base, hardhat, mainnet } from "wagmi/chains";
+import { baseSepolia, hardhat } from "wagmi/chains";
 import { coinbaseWallet, injected, metaMask } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [hardhat],
+  chains: [hardhat, baseSepolia],
   transports: {
-    //[mainnet.id]: http(),
-    //[base.id]: http(),
+    [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
   connectors: [
-    // frameConnector(),
-    // injected(),
+    frameConnector(),
     coinbaseWallet(),
+    injected(),
     metaMask(),
   ],
 });

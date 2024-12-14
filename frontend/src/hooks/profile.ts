@@ -4,31 +4,11 @@ import { useAccount } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
 import { useReadLinkFar, useReadLinkFarGetProfile } from "@/generated";
 
-//type AccountData = {
-//  Links: Record<string, string>;
-//};
-
-//type AccountData = {
-//  Links: Record<string, string>;
-//};
-//type RichProperty = {
-//  name: string;
-//  value: any;
-//  display_type?: string;
-//  class?: string;
-//};
-
 export type AccountData = {
   name?: string;
   description?: string;
   image?: string;
   properties?: Record<string, string>;
-};
-
-type Attribute = {
-  display_type: string;
-  trait_type: string;
-  value: string;
 };
 
 export function useContract() {

@@ -55,8 +55,10 @@ export function frameConnector() {
     },
     async disconnect() {
       const provider = await this.getProvider();
-      if (!provider) connected = false;
-      return;
+      if (!provider) {
+        connected = false;
+        return;
+      }
 
       if (accountsChanged) {
         // @ts-expect-error - provider type is stricter

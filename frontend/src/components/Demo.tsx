@@ -1,7 +1,7 @@
 "use client";
 import sdk, { FrameContext } from "@farcaster/frame-sdk";
 import { useEffect, useState } from "react";
-import { useAccount, useBlockNumber, useChainId, useEnsName } from "wagmi";
+import { useAccount } from "wagmi";
 
 import ConnectButton from "@/components/ConnectButton";
 import CreateAccount from "@/components/CreateAccount";
@@ -10,15 +10,11 @@ import { useProfile } from "@/hooks/profile";
 
 export default function Demo() {
   const [isSDKLoaded, setSDKLoaded] = useState(false);
-  const [context, setContext] = useState<FrameContext>();
-  const [isContextOpen, setContextOpen] = useState(false);
-  const { data: blockNumber } = useBlockNumber({ watch: true });
-  const chainId = useChainId({});
+  const [, setContext] = useState<FrameContext>();
   const { address } = useAccount();
   const { profile } = useProfile(address || "");
 
   useEffect(() => {
-    console.log("sdk effect", blockNumber);
     const load = async () => {
       setContext(await sdk.context);
       sdk.actions.ready();
