@@ -1,12 +1,13 @@
 {
-  "name": "farlink",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn wagmi generate && next dev",
-    "build": "yarn wagmi generate && next build",
+    "dev": "yarn wagmi:generate && next dev",
+    "build": "yarn wagmi:generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "wagmi:generate": "wagmi generate"
   },
   "dependencies": {
     "@farcaster/frame-sdk": "^0.0.12",
