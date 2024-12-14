@@ -4,8 +4,7 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const LinkFarModule = buildModule("LinkFarModule", (m) => {
-  const owner = m.getAccount(0);
-  const linkFar = m.contract("LinkFar", [owner], {});
+  const linkFar = m.contract("LinkFar", [], {});
 
   return { linkFar };
 });

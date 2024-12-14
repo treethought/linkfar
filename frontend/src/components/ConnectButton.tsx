@@ -90,8 +90,8 @@ export function AccountOptions() {
           <li className="mb-4">
             <span>
               Registry address:{" "}
-              {linkFarAddress[31337] && (
-                <pre>{truncMiddle(linkFarAddress[31337], 12)}</pre>
+              {linkFarAddress[chainId] && (
+                <pre>{truncMiddle(linkFarAddress[chainId], 12)}</pre>
               )}
             </span>
           </li>
