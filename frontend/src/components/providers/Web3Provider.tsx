@@ -1,5 +1,5 @@
 "use client";
-// import { frameConnector } from "@/lib/connector";
+import { frameConnector } from "@/lib/connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
 import { baseSepolia, hardhat } from "wagmi/chains";
@@ -18,7 +18,7 @@ const ckConfig = getDefaultConfig({
 export const config = createConfig({
   ...ckConfig,
   connectors: [
-    // frameConnector(),
+    frameConnector(),
     ...ckConfig.connectors ?? [],
   ],
 });

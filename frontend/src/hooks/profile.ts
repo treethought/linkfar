@@ -4,11 +4,21 @@ import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
 import { useReadLinkFar, useReadLinkFarGetProfile } from "@/generated";
 
+export type FarcasterUserData = {
+  fid: number;
+  username?: string;
+  displayName?: string;
+  pfpUrl?: string;
+};
+
 export type AccountData = {
   name?: string;
   description?: string;
   image?: string;
   properties?: Record<string, string>;
+
+  // not in ERC-1155 metadata
+  farcaster?: FarcasterUserData;
 };
 
 export function useContract() {
