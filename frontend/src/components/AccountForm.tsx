@@ -5,6 +5,7 @@ import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
 import CreateAccount from "./CreateAccount";
 import { AccountData, useProfile } from "@/hooks/profile";
 import { useWriteLinkFarUpdateProfile } from "@/generated";
+import { Pencil, X } from "lucide-react";
 
 type FormProps = {
   accountData?: AccountData;
@@ -133,11 +134,22 @@ export function AccountForm(props: FormProps) {
   }
 
   return (
-    <div className="flex flex-col w-full justify-center items-center gap-4 p-4 border border-pink-50">
+    <div className="flex flex-col w-full justify-center items-center gap-4 p-4">
+      {/* Header / title of form */}
+      <div className="flex flex-row justify-between items-center w-full">
+        <h1 className="text font-bold text-lg">Edit Profile</h1>
+        <button
+          className="btn btn-sm"
+          onClick={onClose}
+        >
+          <X />
+        </button>
+      </div>
+
       {/* Name Field */}
       <div className="form-control w-full">
         <label className="label">
-          <span className="label-text font-bold text-lg">Account Name</span>
+          <span className="label-text">Display Name</span>
         </label>
         <input
           type="text"
@@ -152,10 +164,10 @@ export function AccountForm(props: FormProps) {
         />
       </div>
 
-      {/* Description Field */}
+      {/* Bio Field */}
       <div className="form-control w-full">
         <label className="label">
-          <span className="label-text font-medium text-md">Description</span>
+          <span className="label-text font-medium text-md">Bio</span>
         </label>
         <textarea
           className="textarea textarea-bordered"
@@ -170,47 +182,51 @@ export function AccountForm(props: FormProps) {
       </div>
 
       {/* Properties */}
-      {!(localAccountData?.properties)
-        ? (
+      <div className="flex flex-col w-full gap-8">
+        <div className="flex flex-row justify-between items-end w-full">
+          <h3 className="font-bold text-md pb-4">Links</h3>
           <button
-            className="btn btn-primary"
+            className="btn btn-outline btn-md"
             onClick={() => openModal("add")}
           >
-            Add First Link
+            Add Link
           </button>
-        )
-        : (
+        </div>
+        {localAccountData.properties &&
           Object.entries(localAccountData.properties).map(([key, value]) => (
             <div key={key} className="flex gap-2 items-center w-full">
               <span className="w-1/3 text-sm font-medium">{key}</span>
               <span className="grow">{value}</span>
               <button
-                className="btn btn-secondary btn-sm"
+                className="btn btn-tertiary btn-sm"
                 onClick={() =>
                   openModal("edit", key, value)}
               >
-                Edit
+                <Pencil />
               </button>
             </div>
-          ))
-        )}
-
-      {localAccountData.properties && (
-        <button
-          className="btn btn-outline w-full"
-          onClick={() => openModal("add")}
-        >
-          Add Link
-        </button>
-      )}
+          ))}
+      </div>
+      <div className="divider" />
 
       {uploading && <span className="loading loading-ring"></span>}
 
-      {(localAccountData.properties && !uploading && !cid) && (
-        <button className="btn btn-primary w-full" onClick={upload}>
-          Upload
-        </button>
-      )}
+      <div className="flex flex-row justify-center w-full">
+        {(localAccountData.properties && !uploading && !cid) && (
+          <button className="btn " onClick={upload}>
+            Upload
+          </button>
+        )}
+
+        {!sent && cid && (
+          <button
+            className="btn btn-accent w-1/2"
+            onClick={() => setUri()}
+          >
+            Save
+          </button>
+        )}
+      </div>
 
       {(sent && isPending) && <span className="loading loading-bars"></span>}
 
@@ -232,21 +248,21 @@ export function AccountForm(props: FormProps) {
         </div>
       )}
 
-      {!sent && cid && (
-        <button
-          className="btn btn-accent w-full"
-          onClick={() => setUri()}
-        >
-          Save
-        </button>
-      )}
-
       {/* Modal */}
       <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
         <div className="modal-box">
-          <h3 className="font-bold text-lg">
-            {modalMode === "edit" ? "Edit Link" : "Add New Link"}
-          </h3>
+          <div className="flex flex-row justify-between items-center">
+            <h3 className="font-bold text-lg">
+              {modalMode === "edit" ? "Edit Link" : "Add New Link"}
+            </h3>
+
+            <button
+              className="btn btn-primary btn-ghost btn-sm"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
           <div className="form-control mt-4">
             <label className="label">
               <span className="label-text">Key</span>
@@ -271,19 +287,19 @@ export function AccountForm(props: FormProps) {
               placeholder="Enter value"
             />
           </div>
-          <div className="modal-action">
-            <div className="flex flex-row gap-1 justify-end">
+          <div className="modal-action justify-between">
+            <div className="flex">
+              <button className="btn btn-error" onClick={handleDeleteItem}>
+                Delete
+              </button>
+            </div>
+            <div>
               <div>
-                <button className="btn btn-error" onClick={handleDeleteItem}>
-                  Delete
-                </button>
-              </div>
-              <div>
-                <button className="btn btn-primary" onClick={handleSaveModal}>
+                <button
+                  className="btn btn-primary btn-outline"
+                  onClick={handleSaveModal}
+                >
                   Save
-                </button>
-                <button className="btn btn-secondary" onClick={closeModal}>
-                  Cancel
                 </button>
               </div>
             </div>

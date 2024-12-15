@@ -5,20 +5,6 @@ import { useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
 
 export default function Account() {
-  const { isConnected } = useAccount();
-
-  if (!isConnected) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-col justify-center items-center gap-4">
-      <ProfileDataView />
-    </div>
-  );
-}
-
-function ProfileDataView() {
   const { address } = useAccount();
   const { profile, isLoading, error } = useProfile(address);
   const { data: ensName } = useEnsName({ address, chainId: 1 });
@@ -73,40 +59,44 @@ function ProfileDataView() {
       </div>
     );
   }
+  if (isEditing) {
+    return (
+      <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
+        <AccountForm
+          accountData={data}
+          onClose={() => setIsEditing(false)}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col w-full justify-center items-center gap-4 ">
-      {}
-      {isEditing
-        ? <AccountForm accountData={data} onClose={() => setIsEditing(false)} />
-        : (
-          <>
-            <div className="flex flex-col justify-center items-center gap-4">
-              <article className="prose">
-                <h2>{name()}</h2>
-                <p>{data?.description}</p>
-              </article>
-            </div>
-            <div className="flex flex-col gap-4">
-              {data?.properties &&
-                Object.entries(data?.properties).map(([key, value]) => (
-                  value && (
-                    <a
-                      key={key}
-                      href={value}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn btn-primary w-64"
-                    >
-                      {key}
-                    </a>
-                  )
-                ))}
-            </div>
-          </>
-        )}
-      <button className="btn" onClick={() => setIsEditing(!isEditing)}>
-        {isEditing ? "Done" : "Edit"}
+    <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
+      <div className="flex flex-col justify-center items-center gap-4">
+        <article className="prose">
+          <h2>{name()}</h2>
+          <p>{data?.description}</p>
+        </article>
+      </div>
+      <div className="divider" />
+      <div className="flex flex-col gap-4">
+        {data?.properties &&
+          Object.entries(data?.properties).map(([key, value]) => (
+            value && (
+              <a
+                key={key}
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-primary w-64"
+              >
+                {key}
+              </a>
+            )
+          ))}
+      </div>
+      <button className="btn" onClick={() => setIsEditing(true)}>
+        Edit
       </button>
     </div>
   );
