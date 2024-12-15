@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "linkfar",
-  description: "social link tool for web3",
+  title: "LinkFar",
+  description: "Bring your links to Farcaster",
 };
 
 export default function RootLayout({

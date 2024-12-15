@@ -1,3 +1,4 @@
+"use client";
 // import { frameConnector } from "@/lib/connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, http, WagmiProvider } from "wagmi";
