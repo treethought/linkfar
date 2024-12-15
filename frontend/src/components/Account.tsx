@@ -56,7 +56,7 @@ export default function Account() {
         <div className="flex flex-row justify-center items-center gap-4">
           <h1>Account Form</h1>
         </div>
-        <AccountForm accountData={data} />
+        <AccountForm accountData={data} profileSlug={profile.slug} />
       </div>
     );
   }
@@ -65,6 +65,7 @@ export default function Account() {
       <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
         <AccountForm
           accountData={data}
+          profileSlug={profile.slug}
           onClose={() => setIsEditing(false)}
         />
       </div>

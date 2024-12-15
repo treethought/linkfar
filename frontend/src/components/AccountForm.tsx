@@ -4,10 +4,14 @@ import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
 import CreateAccount from "./CreateAccount";
 import { AccountData, useProfile } from "@/hooks/profile";
-import { useWriteLinkFarUpdateProfile } from "@/generated";
+import {
+  useWriteLinkFarSetSlug,
+  useWriteLinkFarUpdateProfile,
+} from "@/generated";
 import { Pencil, X } from "lucide-react";
 
 type FormProps = {
+  profileSlug: string;
   accountData?: AccountData;
   onClose?: () => void;
 };
@@ -22,6 +26,8 @@ export function AccountForm(props: FormProps) {
   const { writeContract, data: txHash, isPending } =
     useWriteLinkFarUpdateProfile();
 
+  const { writeContract: setSlug } = useWriteLinkFarSetSlug();
+
   const { onClose } = props;
 
   const { data: receipt, error: txError } = useWaitForTransactionReceipt({
@@ -34,6 +40,8 @@ export function AccountForm(props: FormProps) {
     description: props.accountData?.description || "",
     properties: props.accountData?.properties || {},
   });
+
+  const [slug, setSlugField] = useState<string>(props.profileSlug);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
@@ -94,7 +102,6 @@ export function AccountForm(props: FormProps) {
     try {
       const metadata = {
         name: localAccountData.name || address,
-        // description: localAccountData.description || "",
         keyvalues: {
           owner: profile?.owner || "",
         },
@@ -129,6 +136,20 @@ export function AccountForm(props: FormProps) {
     setSent(true);
   };
 
+  const doSetSlug = async () => {
+    if (!slug) {
+      console.error("Slug cannot be empty");
+      return;
+    }
+    try {
+      console.log("Setting slug: ", slug);
+      setSlug({ args: [slug] });
+      console.log("Slug set successfully");
+    } catch (e) {
+      console.error("Error setting slug: ", e);
+    }
+  };
+
   if (!profile || address === zeroAddress) {
     return <CreateAccount />;
   }
@@ -138,11 +159,25 @@ export function AccountForm(props: FormProps) {
       {/* Header / title of form */}
       <div className="flex flex-row justify-between items-center w-full">
         <h1 className="text font-bold text-lg">Edit Profile</h1>
-        <button
-          className="btn btn-sm"
-          onClick={onClose}
-        >
+        <button className="btn btn-sm" onClick={onClose}>
           <X />
+        </button>
+      </div>
+
+      {/* Slug Field */}
+      <div className="form-control w-full">
+        <label className="label">
+          <span className="label-text">Slug</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered"
+          value={slug}
+          onChange={(e) => setSlugField(e.target.value)}
+          placeholder="Enter slug"
+        />
+        <button className="btn btn-secondary mt-2" onClick={doSetSlug}>
+          Set Slug
         </button>
       </div>
 
@@ -247,6 +282,7 @@ export function AccountForm(props: FormProps) {
           </div>
         </div>
       )}
+
       <EditLinkModal
         isOpen={isModalOpen}
         mode={modalMode}
