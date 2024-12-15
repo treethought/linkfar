@@ -1,8 +1,28 @@
 import { linkFarAddress } from "@/generated";
-import { ConnectKitButton } from "connectkit";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import * as React from "react";
 import { useChainId } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
+
+function LoginButton() {
+  const {
+    ready,
+    authenticated,
+    connectWallet,
+  } = usePrivy();
+
+  const disableLogin = !ready || (ready && authenticated);
+
+  return (
+    <button
+      className="btn btn-primary"
+      disabled={disableLogin}
+      onClick={() => connectWallet()}
+    >
+      Log in
+    </button>
+  );
+}
 
 export default function ConnectButton() {
   const { isConnected } = useAccount();
@@ -10,7 +30,7 @@ export default function ConnectButton() {
   if (isConnected) {
     return <AccountOptions />;
   }
-  return <ConnectKitButton />;
+  return <LoginButton />;
 }
 
 const contractAddress = (chainId: number) => {
@@ -19,16 +39,22 @@ const contractAddress = (chainId: number) => {
 };
 
 export function AccountOptions() {
+  const { logout } = usePrivy();
   const chainId = useChainId({});
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
   const { data: ensName } = useEnsName({ address, chainId: 1 });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
 
+  const disconnectAndLogout = async () => {
+    await logout();
+    disconnect();
+  };
+
   const shortAddress = truncMiddle(address as string, 12);
 
   if (!address) {
-    return <button onClick={() => disconnect()}>Disconnect</button>;
+    return <button onClick={() => disconnectAndLogout()}>Disconnect</button>;
   }
 
   return (
@@ -66,7 +92,7 @@ export function AccountOptions() {
             </span>
           </li>
           <li>
-            <button onClick={() => disconnect()}>Disconnect</button>
+            <button onClick={() => disconnectAndLogout()}>Disconnect</button>
           </li>
         </ul>
       </div>

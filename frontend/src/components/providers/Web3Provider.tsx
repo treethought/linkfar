@@ -1,58 +1,49 @@
 "use client";
-import { frameConnector } from "@/lib/connector";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Config, createConfig, http, injected, WagmiProvider } from "wagmi";
 import { baseSepolia, hardhat } from "wagmi/chains";
-import { ConnectKitProvider, getDefaultConfig } from "connectkit";
-import { useEffect, useState } from "react";
-import { useInFrame } from "@/hooks/frame";
-import { coinbaseWallet, metaMask, walletConnect } from "wagmi/connectors";
+import { createConfig, WagmiProvider } from "@privy-io/wagmi";
+
+import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
+import { http } from "viem";
 
 const appUrl = process.env.NEXT_PUBLIC_URL;
+const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
 
-const ckConfig = getDefaultConfig({
-  appName: "LinkFar",
+export const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: "users-without-wallets",
+    requireUserPasswordOnCreate: true,
+    noPromptOnSignature: false,
+  },
+  loginMethods: ["wallet"],
+  defaultChain: hardhat,
+  supportedChains: [hardhat, baseSepolia],
+  appearance: {
+    theme: "dark",
+    showWalletLoginFirst: true,
+    walletChainType: "ethereum-only",
+    logo: `${appUrl}/icon.png`,
+  },
+};
+
+export const config = createConfig({
   chains: [hardhat, baseSepolia],
   transports: {
     [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
-  walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
 });
 
 const queryClient = new QueryClient();
 
 export default function Provider({ children }: { children: React.ReactNode }) {
-  const [config, setConfig] = useState<Config>(createConfig(ckConfig));
-  const { inFrame } = useInFrame();
-  const [connectorUsed, setConnectorUsed] = useState(false);
-
-  useEffect(() => {
-    if (inFrame && !connectorUsed) {
-      console.log("Using frame connector");
-      setConnectorUsed(true);
-      const cfg = createConfig({
-        ...ckConfig,
-        connectors: [
-          frameConnector(),
-          ...ckConfig.connectors ?? [],
-        ],
-      });
-      setConfig(cfg);
-    }
-  }, [inFrame, connectorUsed]);
-
   return (
-    <WagmiProvider config={config}>
+    <PrivyProvider appId={privyAppId} config={privyConfig}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider
-          theme="midnight"
-          mode="dark"
-          options={{ embedGoogleFonts: true }}
-        >
+        <WagmiProvider config={config}>
           {children}
-        </ConnectKitProvider>
+        </WagmiProvider>
       </QueryClientProvider>
-    </WagmiProvider>
+    </PrivyProvider>
   );
 }
