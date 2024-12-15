@@ -15,7 +15,7 @@ export default {
     },
   },
   daisyui: {
-    themes: ["dark", "black", "luxury"],
+    themes: ["dark", "black", "luxury", "valentine", "lofi"],
   },
   plugins: [
     require("@tailwindcss/typography"),

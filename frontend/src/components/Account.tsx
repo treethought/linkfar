@@ -1,17 +1,26 @@
 import { useState } from "react";
-import { zeroAddress } from "viem";
+import { Address, zeroAddress } from "viem";
 import { useAccount, useEnsName } from "wagmi";
 import { useAccountAvatar, useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
 
-export default function Account() {
-  const { address } = useAccount();
-  const { profile, isLoading, error } = useProfile(address);
+type Props = {
+  address?: Address;
+};
+
+export default function Account(props: Props) {
+  const { address } = props;
+  const { address: connectedAddress } = useAccount();
+  const { profile, hasProfile, isLoading, error } = useProfile(address);
   const { data: ensName } = useEnsName({ address, chainId: 1 });
-  const { avatar: pfp } = useAccountAvatar(address!);
+  const { avatar: pfp } = useAccountAvatar(address || zeroAddress);
   const { data, loading: dataLoading } = useAccountData(
     address || zeroAddress,
   );
+
+  // TODO: should use privy linked account for verifiaction
+  const isOwner = hasProfile && connectedAddress === profile?.owner &&
+    profile?.owner !== zeroAddress;
 
   const name = () => {
     if (data?.name) {
@@ -27,8 +36,15 @@ export default function Account() {
   );
   const [isEditing, setIsEditing] = useState(false);
 
-  if (!profile || address === zeroAddress) {
-    return null;
+  if (!hasProfile) {
+    // show no profile found 404
+    return (
+      <div className="flex flex-col justify-center items-center gap-4">
+        <div className="flex flex-row justify-center items-center gap-4">
+          <h1>Account Not Found</h1>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading || dataLoading) {
@@ -50,22 +66,21 @@ export default function Account() {
     );
   }
 
-  if (!data?.properties) {
+  if (!data?.properties && isOwner) {
     return (
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="flex flex-row justify-center items-center gap-4">
-          <h1>Account Form</h1>
         </div>
-        <AccountForm accountData={data} profileSlug={profile.slug} />
+        <AccountForm accountData={data} profileSlug={profile?.slug} />
       </div>
     );
   }
-  if (isEditing) {
+  if (isEditing && isOwner) {
     return (
       <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
         <AccountForm
           accountData={data}
-          profileSlug={profile.slug}
+          profileSlug={profile?.slug}
           onClose={() => setIsEditing(false)}
         />
       </div>
@@ -104,9 +119,14 @@ export default function Account() {
             )
           ))}
       </div>
-      <button className="btn" onClick={() => setIsEditing(true)}>
-        Edit
-      </button>
+      {isOwner && (
+        <button
+          className="btn"
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </button>
+      )}
     </div>
   );
 }

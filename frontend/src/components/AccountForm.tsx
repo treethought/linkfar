@@ -11,7 +11,7 @@ import {
 import { Pencil, X } from "lucide-react";
 
 type FormProps = {
-  profileSlug: string;
+  profileSlug?: string;
   accountData?: AccountData;
   onClose?: () => void;
 };
@@ -41,7 +41,7 @@ export function AccountForm(props: FormProps) {
     properties: props.accountData?.properties || {},
   });
 
-  const [slug, setSlugField] = useState<string>(props.profileSlug);
+  const [slug, setSlugField] = useState<string>(props.profileSlug || "");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");

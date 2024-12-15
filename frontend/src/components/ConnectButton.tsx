@@ -1,5 +1,5 @@
 import { linkFarAddress } from "@/generated";
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { usePrivy} from "@privy-io/react-auth";
 import * as React from "react";
 import { useChainId } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";

@@ -25,7 +25,7 @@ export default function Demo() {
         </div>
       </div>
       <div className="flex flex-col items-center gap-4 w-full">
-        {(!hasProfile) ? <Landing /> : <Account />}
+        {(!hasProfile) ? <Landing /> : <Account address={address} />}
       </div>
     </div>
   );

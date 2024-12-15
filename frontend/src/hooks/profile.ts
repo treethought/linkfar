@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { getAddress, zeroAddress } from "viem";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
-import { useReadLinkFar, useReadLinkFarGetProfile } from "@/generated";
+import {
+  useReadLinkFar,
+  useReadLinkFarGetProfile,
+  useReadLinkFarGetProfileBySlug,
+} from "@/generated";
 
 export type FarcasterUserData = {
   fid: number;
@@ -28,6 +32,14 @@ export function useContract() {
     args: [address || zeroAddress],
   });
   return { accountContract };
+}
+
+export function useProfileBySlug(slug: string) {
+  const { data: profile, isLoading, error } = useReadLinkFarGetProfileBySlug({
+    args: [slug],
+  });
+  const hasProfile = profile && profile.owner && profile.owner !== zeroAddress;
+  return { profile, hasProfile, isLoading, error };
 }
 
 export function useProfile(address?: string) {

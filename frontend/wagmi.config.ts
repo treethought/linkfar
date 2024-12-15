@@ -10,7 +10,7 @@ export default defineConfig({
       deployments: {
         LinkFar: {
           31337: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-          84532: "0xa6E577163a4882D0b2f5a5a2C8865439f4162cE9",
+          84532: "0xEAA8FabFcB5e1C1179705e780Efb796312a78100",
         },
       },
     }),
