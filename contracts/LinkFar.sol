@@ -13,6 +13,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 struct Profile {
     address owner;
     string uri;
+    string slug;
 }
 
 contract LinkFar is
@@ -23,8 +24,9 @@ contract LinkFar is
     ERC1155SupplyUpgradeable
 {
     uint256 private nextProfileId;
-    mapping(address => Profile) private addrProfiles;
     mapping(uint256 => Profile) private idProfiles;
+    mapping(address => uint256) private addrToId;
+    mapping(string => uint256) private slugToId;
 
     event ProfileCreated(uint256 indexed id, address indexed owner, string uri);
     event ProfileChanged(uint256 indexed id, address indexed owner, string uri);
@@ -44,25 +46,30 @@ contract LinkFar is
 
     function mint(string memory _uri) public returns (uint256) {
         // each address can only have one profile
-        require(
-            addrProfiles[msg.sender].owner == address(0),
-            "Profile already exists"
-        );
-
+        require(addrToId[msg.sender] == 0, "Profile already exists");
 
         uint256 id = nextProfileId;
         nextProfileId += 1;
 
-        addrProfiles[msg.sender] = Profile(msg.sender, _uri);
-        idProfiles[id] = Profile(msg.sender, _uri);
+        Profile memory profile = Profile(msg.sender, _uri, "");
+
+        idProfiles[id] = profile;
+        addrToId[msg.sender] = id;
 
         _mint(msg.sender, id, 1, "");
-        emit ProfileChanged(id, msg.sender, _uri);
+        emit ProfileCreated(id, msg.sender, _uri);
         return id;
     }
 
     function getProfile(address _user) public view returns (Profile memory) {
-        return addrProfiles[_user];
+        uint256 id = addrToId[_user];
+        return idProfiles[id];
+    }
+
+    function getProfileBySlug(
+        string memory _slug
+    ) public view returns (Profile memory) {
+        return idProfiles[slugToId[_slug]];
     }
 
     /// @notice Override the URI function to return the custom URI
@@ -70,10 +77,21 @@ contract LinkFar is
         return idProfiles[tokenId].uri;
     }
 
+    function setSlug(string memory _slug) public {
+        require(addrToId[msg.sender] != 0, "Profile does not exist");
+        require(slugToId[_slug] == 0, "Slug already taken");
+        uint256 id = addrToId[msg.sender];
+        slugToId[_slug] = id;
+        idProfiles[id].slug = _slug;
+    }
+
     function updateProfile(string memory _uri) public {
-        uint256 bal = balanceOf(msg.sender, 1);
-        require(bal == 1, "Profile does not exist");
-        addrProfiles[msg.sender].uri = _uri;
+        require(
+          addrToId[msg.sender] != 0,
+            "Profile does not exist"
+        );
+        uint256 id = addrToId[msg.sender];
+        idProfiles[id].uri = _uri;
         emit ProfileChanged(1, msg.sender, _uri);
     }
 

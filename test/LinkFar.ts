@@ -5,10 +5,10 @@ import { expect } from "chai";
 import hre from "hardhat";
 import { getAddress } from "viem";
 
-describe("LinkFar", function() {
+describe("LinkFar", function () {
   async function deployLinkFarFixture() {
     // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await hre.viem.getWalletClients();
+    const [owner, otherAccount, account2] = await hre.viem.getWalletClients();
 
     const linkFar = await hre.viem.deployContract("LinkFar", [
       // owner.account.address,
@@ -22,149 +22,139 @@ describe("LinkFar", function() {
       linkFar,
       owner,
       otherAccount,
+      account2,
       publicClient,
     };
   }
 
-  describe("Deployment", function() {
-    it("Should set the right owner", async function() {
-      const { linkFar, owner } = await loadFixture(deployLinkFarFixture);
+  describe("Create Profiles", function () {
+    it("Should create a new profile", async function () {
+      const { linkFar, otherAccount, publicClient } = await loadFixture(
+        deployLinkFarFixture,
+      );
 
-      expect(await linkFar.read.owner()).to.equal(
-        getAddress(owner.account.address),
+      // retrieve the contract with a different account to send a transaction
+      console.log("getting LinkFar as: ", otherAccount.account.address);
+      const linkFarAsOtherAccount = await hre.viem.getContractAt(
+        "LinkFar",
+        linkFar.address,
+        { client: { wallet: otherAccount } },
+      );
+
+      let hash = await linkFarAsOtherAccount.write.mint(["test"]);
+      console.log("minted for account: ", otherAccount.account.address);
+
+      let receipt = await publicClient.waitForTransactionReceipt({ hash });
+      expect(receipt.status).to.equal("success");
+
+      // get the withdrawal events in the latest block
+      const events = await linkFarAsOtherAccount.getEvents.ProfileCreated();
+      expect(events).to.have.lengthOf(1);
+      console.log("events: ", events);
+      expect(events[0].args.id).to.equal(1n);
+      expect(events[0].args.uri).to.equal("test");
+      expect(events[0].args.owner).to.equal(
+        getAddress(otherAccount.account.address),
+      );
+
+      //// check the new account contract was deployed with otherAccount as owner
+      //
+      let total = await linkFarAsOtherAccount.read.totalSupply();
+      expect(total).to.equal(1n);
+
+      let profile = await linkFarAsOtherAccount.read.getProfile(
+        [otherAccount.account.address],
+      );
+      expect(profile.uri).to.equal("test");
+      expect(profile.owner).to.equal(getAddress(otherAccount.account.address));
+
+      // shoudl revert with profile already exists
+      expect(linkFarAsOtherAccount.write.mint(["test"])).to.be.rejectedWith(
+        "Profile already exists",
       );
     });
+  });
 
-    describe("Create Profiles", function() {
-      it("Should create a new profile", async function() {
-        const { linkFar, otherAccount, publicClient } = await loadFixture(
+  describe("Manage profile", function () {
+    it("should reject updating profile when user does not have one ", async function () {
+      const { linkFar } = await loadFixture(deployLinkFarFixture);
+      expect(linkFar.write.updateProfile(["test"])).to.be.rejectedWith(
+        "Profile does not exist",
+      );
+    });
+    it("should update user's profile", async function () {
+      const { linkFar, account2, otherAccount, publicClient } =
+        await loadFixture(
           deployLinkFarFixture,
         );
 
-        // retrieve the contract with a different account to send a transaction
-        console.log("getting LinkFar as: ", otherAccount.account.address);
-        const linkFarAsOtherAccount = await hre.viem.getContractAt(
-          "LinkFar",
-          linkFar.address,
-          { client: { wallet: otherAccount } },
-        );
+      let contract = await hre.viem.getContractAt(
+        "LinkFar",
+        linkFar.address,
+        { client: { wallet: account2 } },
+      );
 
-        let hash = await linkFarAsOtherAccount.write.mint(["test"]);
-        console.log("minted for account: ", otherAccount.account.address);
+      console.log("minting from account2: ", account2.account.address);
 
-        await publicClient.waitForTransactionReceipt({ hash });
+      let hash = await contract.write.mint(["uri1"]);
+      let receipt = await publicClient.waitForTransactionReceipt({ hash });
+      expect(receipt.status).to.equal("success");
 
-        // get the withdrawal events in the latest block
-        const events = await linkFarAsOtherAccount.getEvents.ProfileCreated();
-        // expect(events).to.have.lengthOf(1);
-        console.log("events: ", events);
+      let events = await contract.getEvents.ProfileCreated();
+      expect(events).to.have.lengthOf(1);
+      expect(events[0].args.id).to.equal(1n);
+      expect(events[0].args.uri).to.equal("uri1");
+      expect(events[0].args.owner).to.equal(
+        getAddress(account2.account.address),
+      );
+      console.log("event for minted profile");
+      console.log(events[0]);
 
-        // expect(events[0].args.id).to.equal(1);
+      let profile = await contract.read.getProfile([
+        account2.account.address,
+      ]);
+      expect(profile.uri).to.equal("uri1");
+      expect(profile.owner).to.equal(getAddress(account2.account.address));
 
-        //// check the new account contract was deployed with otherAccount as owner
-        //
-        let total = await linkFarAsOtherAccount.read.totalSupply();
-        expect(total).to.equal(1n);
+      let idUri = await contract.read.uri([1n]);
+      expect(idUri).to.equal("uri1");
 
-        let profile = await linkFarAsOtherAccount.read.getProfile(
-          [otherAccount.account.address],
-        );
-        expect(profile.uri).to.equal("test");
-        //
-        //expect(await createdAccount.read.owner()).to.equal(
-        //  getAddress(otherAccount.account.address),
-        //);
+      let updateHash = await expect(contract.write.updateProfile(["uri2"])).to
+        .not.be.rejected;
+
+      console.log("updateHash: ", updateHash);
+
+      receipt = await publicClient.waitForTransactionReceipt({
+        hash: updateHash,
       });
+      expect(receipt.status).to.equal("success");
+
+      let updateEvents = await contract.getEvents.ProfileChanged();
+      expect(updateEvents).to.have.lengthOf(1);
+      expect(updateEvents[0].args.id).to.equal(1n);
+      expect(updateEvents[0].args.uri).to.equal("uri2");
+      console.log("event for updated profile");
+      console.log(updateEvents[0]);
+
+      profile = await contract.read.getProfile([
+        account2.account.address,
+      ]);
+      expect(profile.owner).to.equal(getAddress(account2.account.address));
+      expect(profile.uri).to.equal("uri2");
+
+      idUri = await contract.read.uri([1n]);
+      expect(idUri).to.equal("uri2");
+
+      let asOtherAccount = await hre.viem.getContractAt(
+        "LinkFar",
+        linkFar.address,
+        { client: { wallet: otherAccount } },
+      );
+
+      profile = await asOtherAccount.read.getProfile([
+        account2.account.address,
+      ]);
+      expect(profile.uri).to.equal("uri2");
     });
   });
 });
-
-//import {
-//  loadFixture,
-//} from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
-//import { expect } from "chai";
-//import hre from "hardhat";
-//import { getAddress } from "viem";
-//import { accountAbi } from "../frontend/src/generated";
-//
-//describe("Account", function() {
-//  async function deployAccountFixture() {
-//    // Contracts are deployed using the first signer/account by default
-//    const [creator, owner] = await hre.viem.getWalletClients();
-//
-//    const account = await hre.viem.deployContract("Account", [
-//      getAddress(owner.account.address),
-//      "",
-//    ], {});
-//    const publicClient = await hre.viem.getPublicClient();
-//
-//    return {
-//      account,
-//      creator,
-//      owner,
-//      publicClient,
-//    };
-//  }
-//
-//  describe("Deployment", function() {
-//    it("Should set the right owner", async function() {
-//      const { account, owner } = await loadFixture(deployAccountFixture);
-//
-//      expect(await account.read.owner()).to.equal(
-//        getAddress(owner.account.address),
-//      );
-//    });
-//  });
-//  describe("Set URI", function() {
-//    it("Should fail to set the URI if not the owner", async function() {
-//      const { account, creator } = await loadFixture(deployAccountFixture);
-//
-//      // retrieve the contract with a different account to send a transaction
-//      const accountAsCreator = await hre.viem.getContractAt(
-//        "Account",
-//        account.address,
-//        { client: { wallet: creator } },
-//      );
-//
-//      const uri = "http://example.com";
-//      await expect(accountAsCreator.write.setUri([uri])).to.be
-//        .rejectedWith(
-//          "Not owner",
-//        );
-//
-//      // check the new account contract was deployed with otherAccount as owner
-//      expect(await accountAsCreator.read.uri()).to.equal("");
-//    });
-//
-//    it("Should set the URI", async function() {
-//      const { account, owner, publicClient } = await loadFixture(
-//        deployAccountFixture,
-//      );
-//
-//      const accountAsOwner = await hre.viem.getContractAt(
-//        "Account",
-//        account.address,
-//        { client: { wallet: owner } },
-//      );
-//
-//      let hash = await accountAsOwner.write.setUri(
-//        ["https://example.com"],
-//      );
-//      console.log("hash: ", hash);
-//
-//      await publicClient.waitForTransactionReceipt({ hash });
-//
-//      const events = await accountAsOwner.getEvents.UriSet();
-//      expect(events).to.have.lengthOf(1);
-//
-//      const eventUri = events[0].args.uri;
-//
-//      expect(eventUri).to.equal("https://example.com");
-//
-//      // check the new account contract was deployed with otherAccount as owner
-//      expect(await accountAsOwner.read.uri()).to.equal(
-//        "https://example.com",
-//      );
-//    });
-//  });
-//});

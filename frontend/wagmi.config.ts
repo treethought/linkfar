@@ -9,7 +9,7 @@ export default defineConfig({
       project: "../",
       deployments: {
         LinkFar: {
-          31337: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          31337: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
           84532: "0xa6E577163a4882D0b2f5a5a2C8865439f4162cE9",
         },
       },
