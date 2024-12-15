@@ -1,6 +1,4 @@
 "use client";
-import sdk, { FrameContext } from "@farcaster/frame-sdk";
-import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 import ConnectButton from "@/components/ConnectButton";
@@ -9,21 +7,8 @@ import Account from "./Account";
 import { useProfile } from "@/hooks/profile";
 
 export default function Demo() {
-  const [isSDKLoaded, setSDKLoaded] = useState(false);
-  const [, setContext] = useState<FrameContext>();
   const { address, isConnected } = useAccount();
   const { hasProfile } = useProfile(address || "");
-
-  useEffect(() => {
-    const load = async () => {
-      setContext(await sdk.context);
-      sdk.actions.ready();
-    };
-    if (sdk && !isSDKLoaded) {
-      setSDKLoaded(true);
-      load();
-    }
-  }, [isSDKLoaded]);
 
   return (
     <div className="w-full h-screen mx-auto py-4 px-1">
