@@ -247,63 +247,88 @@ export function AccountForm(props: FormProps) {
           </div>
         </div>
       )}
+      <EditLinkModal
+        isOpen={isModalOpen}
+        mode={modalMode}
+        currentKey={currentKey}
+        currentValue={currentValue}
+        onClose={closeModal}
+        onSave={handleSaveModal}
+        onDelete={handleDeleteItem}
+        setKey={setCurrentKey}
+        setValue={setCurrentValue}
+      />
+    </div>
+  );
+}
 
-      {/* Modal */}
-      <div className={`modal ${isModalOpen ? "modal-open" : ""}`}>
-        <div className="modal-box">
-          <div className="flex flex-row justify-between items-center">
-            <h3 className="font-bold text-lg">
-              {modalMode === "edit" ? "Edit Link" : "Add New Link"}
-            </h3>
+type EditLinkModalProps = {
+  isOpen: boolean;
+  mode: "add" | "edit";
+  currentKey: string;
+  currentValue: string;
+  onClose: () => void;
+  onSave: () => void;
+  onDelete: () => void;
+  setKey: (key: string) => void;
+  setValue: (value: string) => void;
+};
 
-            <button
-              className="btn btn-primary btn-ghost btn-sm"
-              onClick={closeModal}
-            >
-              Close
-            </button>
-          </div>
-          <div className="form-control mt-4">
-            <label className="label">
-              <span className="label-text">Key</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered"
-              value={currentKey}
-              onChange={(e) => setCurrentKey(e.target.value)}
-              placeholder="Enter key"
-            />
-          </div>
-          <div className="form-control mt-4">
-            <label className="label">
-              <span className="label-text">Value</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered"
-              value={currentValue}
-              onChange={(e) => setCurrentValue(e.target.value)}
-              placeholder="Enter value"
-            />
-          </div>
-          <div className="modal-action justify-between">
-            <div className="flex">
-              <button className="btn btn-error" onClick={handleDeleteItem}>
-                Delete
-              </button>
-            </div>
-            <div>
-              <div>
-                <button
-                  className="btn btn-primary btn-outline"
-                  onClick={handleSaveModal}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
+export function EditLinkModal(props: EditLinkModalProps) {
+  if (!props.isOpen) return null;
+
+  return (
+    <div className={`modal modal-open`}>
+      <div className="modal-box">
+        <div className="flex flex-row justify-between items-center">
+          <h3 className="font-bold text-lg">
+            {props.mode === "edit" ? "Edit Link" : "Add New Link"}
+          </h3>
+          <button
+            className="btn btn-primary btn-ghost btn-sm"
+            onClick={props.onClose}
+          >
+            <X />
+          </button>
+        </div>
+
+        <div className="form-control mt-4">
+          <label className="label">
+            <span className="label-text">Key</span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered"
+            value={props.currentKey}
+            onChange={(e) => props.setKey(e.target.value)}
+            placeholder="Enter key"
+          />
+        </div>
+
+        <div className="form-control mt-4">
+          <label className="label">
+            <span className="label-text">Value</span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered"
+            value={props.currentValue}
+            onChange={(e) => props.setValue(e.target.value)}
+            placeholder="Enter value"
+          />
+        </div>
+
+        <div className="modal-action justify-between">
+          <button className="btn btn-error" onClick={props.onDelete}>
+            Delete
+          </button>
+
+          <button
+            className="btn btn-primary btn-outline"
+            onClick={props.onSave}
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
