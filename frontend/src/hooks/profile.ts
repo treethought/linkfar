@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAddress, zeroAddress } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
 import { useReadLinkFar, useReadLinkFarGetProfile } from "@/generated";
 
@@ -63,4 +63,26 @@ export function useAccountData(address: string) {
     getData();
   }, [uri]);
   return { data, error, loading };
+}
+
+export function useAccountAvatar(address: string) {
+  const { data: ensName } = useEnsName({
+    address: getAddress(address),
+    chainId: 1,
+  });
+  const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
+  const { data, loading, error } = useAccountData(address);
+
+  if (data?.image) {
+    return { avatar: data.image, loading, error };
+  }
+  if (data?.farcaster?.pfpUrl) {
+    return { avatar: data.farcaster.pfpUrl, loading, error };
+  }
+
+  if (ensAvatar) {
+    return { avatar: ensAvatar, loading, error };
+  }
+
+  return { avatar: data?.image, loading, error };
 }

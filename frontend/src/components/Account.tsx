@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { zeroAddress } from "viem";
 import { useAccount, useEnsName } from "wagmi";
-import { useAccountData, useProfile } from "@/hooks/profile";
+import { useAccountAvatar, useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
 
 export default function Account() {
   const { address } = useAccount();
   const { profile, isLoading, error } = useProfile(address);
   const { data: ensName } = useEnsName({ address, chainId: 1 });
+  const { avatar: pfp } = useAccountAvatar(address!);
   const { data, loading: dataLoading } = useAccountData(
     address || zeroAddress,
   );
@@ -74,6 +75,13 @@ export default function Account() {
     <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
       <div className="flex flex-col justify-center items-center gap-4">
         <article className="prose">
+          {pfp && (
+            <div className="avatar">
+              <div className="w-10 rounded-full">
+                <img src={pfp} alt="ens avatar" />
+              </div>
+            </div>
+          )}
           <h2>{name()}</h2>
           <p>{data?.description}</p>
         </article>
