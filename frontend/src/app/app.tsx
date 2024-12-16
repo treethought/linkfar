@@ -2,6 +2,7 @@
 
 import ConnectButton from "@/components/ConnectButton";
 import ThemeController from "@/components/ThemeController";
+import { useFrameContext } from "@/hooks/frame";
 import dynamic from "next/dynamic";
 import { useAccount } from "wagmi";
 
@@ -29,6 +30,7 @@ export function NavBar() {
 }
 
 export default function App() {
+  const {} = useFrameContext();
   return (
     <main className="min-h-screen flex flex-col p-4">
       <div className="w-full h-screen mx-auto py-4 px-1">

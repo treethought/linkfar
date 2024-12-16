@@ -24,11 +24,13 @@ function Landing() {
       <div className="hero min-h-[60vh] bg-gradient-to-r">
         <div className="hero-content text-center">
           <div className="max-w-md">
-            <h1 className="text-5xl font-bold">LinkFar</h1>
-            <img src="/icon.svg" alt="LinkFar" className="w-1/2 mx-auto my-4" />
-            <p className="py-4 text-lg">
-              Bring your links to Farcaster
-            </p>
+            <div className="flex flex-col items-center gap-4">
+              <h1 className="text-5xl font-bold mb-2">LinkFar</h1>
+              <img src="/icon.svg" alt="LinkFar" className="w-1/2 mx-auto" />
+              <p className="text-lg">
+                Bring your links to Farcaster
+              </p>
+            </div>
             <div className="mt-4 flex flex-row justify-center">
               {!isConnected && <ConnectButton />}
               {isConnected && !hasProfile && <CreateAccount />}
