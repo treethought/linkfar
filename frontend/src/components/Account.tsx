@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Address, zeroAddress } from "viem";
 import { useAccount, useEnsName } from "wagmi";
-import { useAccountAvatar, useAccountData, useProfile } from "@/hooks/profile";
+import { useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
+import ProfileAvatar from "./ProfileAvatar";
 
-type Props = {
+export type Props = {
   address?: Address;
 };
 
@@ -13,7 +14,6 @@ export default function Account(props: Props) {
   const { address: connectedAddress } = useAccount();
   const { profile, hasProfile, isLoading, error } = useProfile(address);
   const { data: ensName } = useEnsName({ address, chainId: 1 });
-  const { avatar: pfp } = useAccountAvatar(address || zeroAddress);
   const { data, loading: dataLoading } = useAccountData(
     address || zeroAddress,
   );
@@ -89,15 +89,9 @@ export default function Account(props: Props) {
 
   return (
     <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
-      <div className="flex flex-col justify-center items-center gap-4">
-        <article className="prose">
-          {pfp && (
-            <div className="avatar">
-              <div className="w-10 rounded-full">
-                <img src={pfp} alt="ens avatar" />
-              </div>
-            </div>
-          )}
+      <div className="flex flex-col w-full justify-center items-center gap-4">
+        <ProfileAvatar address={address as string} className="w-12" />
+        <article className="prose text-center">
           <h2>{name()}</h2>
           <p>{data?.description}</p>
         </article>

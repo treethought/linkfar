@@ -181,22 +181,41 @@ export function AccountForm(props: FormProps) {
         </button>
       </div>
 
-      {/* Name Field */}
-      <div className="form-control w-full">
-        <label className="label">
-          <span className="label-text">Display Name</span>
-        </label>
-        <input
-          type="text"
-          className="input input-bordered"
-          value={localAccountData.name}
-          onChange={(e) =>
-            setLocalAccountData((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }))}
-          placeholder="Enter account name"
-        />
+      {/* Avatar and Name Field */}
+      <div className="flex flex-row justify-between items-center w-full">
+        <div className="form-control w-1/2">
+          <label className="label">
+            <span className="label-text">Avatar</span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered"
+            value={localAccountData.image}
+            onChange={(e) =>
+              setLocalAccountData((prev) => ({
+                ...prev,
+                image: e.target.value,
+              }))}
+            placeholder="Enter avatar URL"
+          />
+        </div>
+
+        <div className="form-control w-full">
+          <label className="label">
+            <span className="label-text">Display Name</span>
+          </label>
+          <input
+            type="text"
+            className="input input-bordered"
+            value={localAccountData.name}
+            onChange={(e) =>
+              setLocalAccountData((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))}
+            placeholder="Enter account name"
+          />
+        </div>
       </div>
 
       {/* Bio Field */}

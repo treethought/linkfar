@@ -7,6 +7,13 @@ import {
   useReadLinkFarGetProfile,
   useReadLinkFarGetProfileBySlug,
 } from "@/generated";
+import Profile from "@/app/[slug]/page";
+
+export interface Profile {
+  owner: string;
+  uri: string;
+  slug: string;
+}
 
 export type FarcasterUserData = {
   fid: number;
@@ -50,7 +57,8 @@ export function useProfile(address?: string) {
     args: [getAddress(address)],
   });
   const hasProfile = profile && profile.owner && profile.owner !== zeroAddress;
-  return { profile, hasProfile, isLoading, error };
+  const p = profile as Profile;
+  return { profile: p, hasProfile, isLoading, error };
 }
 
 export function useProfileUri(address: string) {
