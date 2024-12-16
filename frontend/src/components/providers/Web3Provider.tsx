@@ -1,6 +1,6 @@
 "use client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { baseSepolia, hardhat } from "wagmi/chains";
+import { base, baseSepolia, hardhat } from "wagmi/chains";
 import { createConfig, WagmiProvider } from "@privy-io/wagmi";
 
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
@@ -16,8 +16,8 @@ export const privyConfig: PrivyClientConfig = {
     noPromptOnSignature: false,
   },
   loginMethods: ["wallet"],
-  defaultChain: hardhat,
-  supportedChains: [hardhat, baseSepolia],
+  defaultChain: base,
+  supportedChains: [hardhat, baseSepolia, base],
   appearance: {
     theme: "dark",
     showWalletLoginFirst: true,
@@ -27,8 +27,9 @@ export const privyConfig: PrivyClientConfig = {
 };
 
 export const config = createConfig({
-  chains: [hardhat, baseSepolia],
+  chains: [hardhat, baseSepolia, base],
   transports: {
+    [base.id]: http(),
     [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
