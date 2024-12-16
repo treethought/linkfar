@@ -25,6 +25,7 @@ function Landing() {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-5xl font-bold">LinkFar</h1>
+            <img src="/icon.svg" alt="LinkFar" className="w-1/2 mx-auto my-4" />
             <p className="py-4 text-lg">
               Bring your links to Farcaster
             </p>

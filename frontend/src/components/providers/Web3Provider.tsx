@@ -22,7 +22,7 @@ export const privyConfig: PrivyClientConfig = {
     theme: "dark",
     showWalletLoginFirst: true,
     walletChainType: "ethereum-only",
-    logo: `${appUrl}/icon.png`,
+    logo: `${appUrl}/icon.svg`,
   },
 };
 

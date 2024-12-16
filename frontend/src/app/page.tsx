@@ -12,7 +12,7 @@ const frame = {
       type: "launch_frame",
       name: "LinkFar",
       url: appUrl,
-      splashImageUrl: `${appUrl}/splash.png`,
+      splashImageUrl: `${appUrl}/icon.svg`,
       splashBackgroundColor: "#f7f7f7",
     },
   },

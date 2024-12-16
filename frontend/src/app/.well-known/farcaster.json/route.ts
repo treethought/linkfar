@@ -12,8 +12,8 @@ export async function GET() {
     frame: {
       version: "0.0.1",
       name: "LinkFar",
-      iconUrl: `${appUrl}/icon.png`,
-      splashImageUrl: `${appUrl}/icon.png`,
+      iconUrl: `${appUrl}/icon.svg`,
+      splashImageUrl: `${appUrl}/icon.svg`,
       splashBackgroundColor: "#f7f7f7",
       homeUrl: appUrl,
       // webhookUrl: `${appUrl}/api/webhook`,
