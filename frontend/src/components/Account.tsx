@@ -90,7 +90,7 @@ export default function Account(props: Props) {
   return (
     <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
       <div className="flex flex-col w-full justify-center items-center gap-4">
-        <ProfileAvatar address={address as string} className="w-12" />
+        <ProfileAvatar address={address as string} className="w-28" />
         <article className="prose text-center">
           <h2>{name()}</h2>
           <p>{data?.description}</p>

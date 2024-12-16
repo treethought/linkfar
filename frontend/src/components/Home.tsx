@@ -6,29 +6,14 @@ import CreateAccount from "@/components/CreateAccount";
 import Account from "./Account";
 import { useProfile } from "@/hooks/profile";
 
-export default function Demo() {
-  const { address, isConnected } = useAccount();
+export default function Home() {
+  const { address } = useAccount();
   const { hasProfile } = useProfile(address || "");
 
-  return (
-    <div className="w-full h-screen mx-auto py-4 px-1">
-      <div className="flex flex-col items-center gap-4 ">
-        <div className="flex flex-row w-full justify-between items-center gap-4 px-2">
-          <h1 className="text-2xl font-bold text-center mb-4 primary-content">
-            LinkFar
-          </h1>
-          {isConnected && (
-            <div className="mb-4 ">
-              <ConnectButton />
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col items-center gap-4 w-full">
-        {(!hasProfile) ? <Landing /> : <Account address={address} />}
-      </div>
-    </div>
-  );
+  if (hasProfile) {
+    return <Account address={address} />;
+  }
+  return <Landing />;
 }
 
 function Landing() {
