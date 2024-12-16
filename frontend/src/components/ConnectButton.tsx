@@ -1,5 +1,5 @@
-import { linkFarAddress } from "@/generated";
-import { usePrivy } from "@privy-io/react-auth";
+import { useProxyAddress } from "@/hooks/contract";
+import { useConnectWallet, usePrivy } from "@privy-io/react-auth";
 import * as React from "react";
 import { useChainId } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
@@ -8,8 +8,16 @@ function LoginButton() {
   const {
     ready,
     authenticated,
-    connectWallet,
   } = usePrivy();
+
+  const { connectWallet } = useConnectWallet({
+    onSuccess: (wallet) => {
+      console.log("Connected account", wallet);
+    },
+    onError: (error) => {
+      console.error("Failed to connect wallet", error);
+    },
+  });
 
   const disableLogin = !ready || (ready && authenticated);
 
@@ -33,11 +41,6 @@ export default function ConnectButton() {
   return <LoginButton />;
 }
 
-const contractAddress = (chainId: number) => {
-  const c = chainId as keyof typeof linkFarAddress;
-  return linkFarAddress[c];
-};
-
 export function AccountOptions() {
   const { logout } = usePrivy();
   const chainId = useChainId({});
@@ -45,6 +48,7 @@ export function AccountOptions() {
   const { disconnect } = useDisconnect();
   const { data: ensName } = useEnsName({ address, chainId: 1 });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
+  const proxyAddress = useProxyAddress();
 
   const disconnectAndLogout = async () => {
     await logout();
@@ -57,6 +61,7 @@ export function AccountOptions() {
     return <button onClick={() => disconnectAndLogout()}>Disconnect</button>;
   }
 
+  // TODO consider summary like in nav example
   return (
     <div className="flex flex-row gap-2 justify-end items-center">
       {ensAvatar &&
@@ -82,8 +87,7 @@ export function AccountOptions() {
         >
           <li className="mb-4">
             <span>
-              Contract address:{" "}
-              <pre>{truncMiddle(contractAddress(chainId)!, 12)}</pre>
+              Contract address: <pre>{truncMiddle(proxyAddress, 12)}</pre>
             </span>
           </li>
           <li className="mb-4">
@@ -101,6 +105,9 @@ export function AccountOptions() {
 }
 
 export const truncMiddle = (str: string, len: number) => {
+  if (!str) {
+    return "";
+  }
   if (str.length <= len) {
     return str;
   }

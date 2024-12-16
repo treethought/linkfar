@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAddress, zeroAddress } from "viem";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { useEnsAvatar, useEnsName, useReadContract } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
-import {
-  useReadLinkFar,
-  useReadLinkFarGetProfile,
-  useReadLinkFarGetProfileBySlug,
-} from "@/generated";
+import { linkFarAbi } from "@/generated";
 import Profile from "@/app/[slug]/page";
+import { useProxyAddress } from "./contract";
 
 export interface Profile {
   owner: string;
@@ -32,28 +29,29 @@ export type AccountData = {
   farcaster?: FarcasterUserData;
 };
 
-export function useContract() {
-  const { address } = useAccount();
-  const { data: accountContract } = useReadLinkFar({
-    account: address,
-    args: [address || zeroAddress],
-  });
-  return { accountContract };
-}
-
 export function useProfileBySlug(slug: string) {
-  const { data: profile, isLoading, error } = useReadLinkFarGetProfileBySlug({
+  const address = useProxyAddress();
+  const { data: profile, isLoading, error } = useReadContract({
+    abi: linkFarAbi,
+    address: address,
+    functionName: "getProfileBySlug",
     args: [slug],
   });
+
   const hasProfile = profile && profile.owner && profile.owner !== zeroAddress;
   return { profile, hasProfile, isLoading, error };
 }
 
 export function useProfile(address?: string) {
+  const proxyAddress = useProxyAddress();
+
   if (!address) {
     address = zeroAddress;
   }
-  const { data: profile, isLoading, error } = useReadLinkFarGetProfile({
+  const { data: profile, isLoading, error } = useReadContract({
+    abi: linkFarAbi,
+    address: proxyAddress,
+    functionName: "getProfile",
     args: [getAddress(address)],
   });
   const hasProfile = profile && profile.owner && profile.owner !== zeroAddress;

@@ -4,15 +4,14 @@ import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { buildIpfsUrl, uploadAccountData } from "@/lib/ipfs";
 import CreateAccount from "./CreateAccount";
 import { AccountData, useProfile } from "@/hooks/profile";
-import {
-  useWriteLinkFarSetSlug,
-  useWriteLinkFarUpdateProfile,
-} from "@/generated";
 import { Pencil, X } from "lucide-react";
+import { FrameContext } from "@farcaster/frame-sdk";
+import { useSetSlug, useUpdateProfile } from "@/hooks/contract";
 
 type FormProps = {
   profileSlug?: string;
   accountData?: AccountData;
+  ctx?: FrameContext;
   onClose?: () => void;
 };
 
@@ -23,10 +22,9 @@ export function AccountForm(props: FormProps) {
   const [sent, setSent] = useState(false);
   const { address } = useAccount();
   const { profile } = useProfile(address);
-  const { writeContract, data: txHash, isPending } =
-    useWriteLinkFarUpdateProfile();
-
-  const { writeContract: setSlug } = useWriteLinkFarSetSlug();
+  const { writeContract: updateProfile, data: txHash, isPending } =
+    useUpdateProfile();
+  const setSlug = useSetSlug();
 
   const { onClose } = props;
 
@@ -130,9 +128,7 @@ export function AccountForm(props: FormProps) {
     const uri = buildIpfsUrl(cid);
     console.log("setting uri: ", uri);
 
-    writeContract({
-      args: [uri],
-    });
+    updateProfile([uri]);
     setSent(true);
   };
 
@@ -143,7 +139,7 @@ export function AccountForm(props: FormProps) {
     }
     try {
       console.log("Setting slug: ", slug);
-      setSlug({ args: [slug] });
+      setSlug(slug);
       console.log("Slug set successfully");
     } catch (e) {
       console.error("Error setting slug: ", e);
@@ -190,7 +186,7 @@ export function AccountForm(props: FormProps) {
           <input
             type="text"
             className="input input-bordered"
-            value={localAccountData.image}
+            value={localAccountData?.image || ""}
             onChange={(e) =>
               setLocalAccountData((prev) => ({
                 ...prev,
@@ -314,6 +310,39 @@ export function AccountForm(props: FormProps) {
         setValue={setCurrentValue}
       />
     </div>
+  );
+}
+
+type FarcasterDataFormProps = {
+  ctx?: FrameContext;
+};
+
+export function FarcasterDataForm(props: FarcasterDataFormProps) {
+  if (!props.ctx) return null;
+  return (
+    <>
+      <div className="flex flex-row justify-between items-center w-full">
+        <h1 className="text font-bold text-lg">Farcaster</h1>
+      </div>
+
+      {JSON.stringify(props.ctx)}
+      <div className="form-control w-full">
+        <label className="label">
+          <span className="label-text">Display Name</span>
+        </label>
+        <input
+          type="text"
+          className="input input-bordered"
+          value={props.ctx.user.displayName}
+          //onChange={(e) =>
+          //  setLocalAccountData((prev) => ({
+          //    ...prev,
+          //    name: e.target.value,
+          //  }))}
+          placeholder={props.ctx?.user.displayName || "No display name"}
+        />
+      </div>
+    </>
   );
 }
 

@@ -1,15 +1,9 @@
-import { useWriteLinkFarMint } from "@/generated";
+import { useCreateAccount } from "@/hooks/contract";
 import { useAccount } from "wagmi";
 
 export default function CreateAccount() {
   const { isConnected } = useAccount();
-  const { writeContract } = useWriteLinkFarMint();
-  const createAccount = () => {
-    console.log("creating account");
-    writeContract({
-      args: ["test"],
-    });
-  };
+  const createAccount = useCreateAccount();
 
   return (
     <button className="btn" onClick={() => createAccount()}>

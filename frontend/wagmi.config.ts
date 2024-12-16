@@ -8,6 +8,9 @@ export default defineConfig({
     hardhat({
       project: "../",
       deployments: {
+        TransparentUpgradeableProxy: {
+          84532: "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
+        },
         LinkFar: {
           31337: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
           84532: "0xEAA8FabFcB5e1C1179705e780Efb796312a78100",

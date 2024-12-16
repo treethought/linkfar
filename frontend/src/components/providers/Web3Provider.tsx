@@ -15,9 +15,14 @@ export const privyConfig: PrivyClientConfig = {
     requireUserPasswordOnCreate: true,
     noPromptOnSignature: false,
   },
+  externalWallets: {
+    coinbaseWallet: {
+      connectionOptions: "all",
+    },
+  },
   loginMethods: ["wallet"],
-  defaultChain: base,
-  supportedChains: [hardhat, baseSepolia, base],
+  defaultChain: baseSepolia,
+  supportedChains: [baseSepolia],
   appearance: {
     theme: "dark",
     showWalletLoginFirst: true,
@@ -27,7 +32,7 @@ export const privyConfig: PrivyClientConfig = {
 };
 
 export const config = createConfig({
-  chains: [hardhat, baseSepolia, base],
+  chains: [baseSepolia],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),
