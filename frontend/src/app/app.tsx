@@ -1,5 +1,6 @@
 "use client";
 
+import ChainSwitcher from "@/components/ChainSwitcher";
 import ConnectButton from "@/components/ConnectButton";
 import ThemeController from "@/components/ThemeController";
 import { useFrameContext } from "@/hooks/frame";
@@ -18,6 +19,7 @@ export function NavBar() {
         LinkFar
       </h1>
       <div className="flex flex-row items-center gap-4">
+        <ChainSwitcher />
         <ThemeController />
         {isConnected && (
           <div className="mb-4 ">

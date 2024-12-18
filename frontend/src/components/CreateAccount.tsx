@@ -3,7 +3,7 @@ import { useAccount } from "wagmi";
 
 export default function CreateAccount() {
   const { isConnected } = useAccount();
-  const createAccount = useCreateAccount();
+  const {writeContract: createAccount} = useCreateAccount();
 
   return (
     <button className="btn" onClick={() => createAccount()}>

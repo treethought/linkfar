@@ -8,17 +8,17 @@ export function useProxyAddress() {
 }
 
 export function useCreateAccount() {
-  const { writeContract } = useWriteContract();
+  const { writeContract: write, data, isPending } = useWriteContract();
   const address = useProxyAddress();
-  const createAccount = () => {
-    writeContract({
+  const writeContract = () => {
+    write({
       abi: linkFarAbi,
       address: address,
       functionName: "mint",
       args: [""],
     });
   };
-  return createAccount;
+  return { writeContract, data, isPending };
 }
 
 export function useSetSlug() {
@@ -46,7 +46,6 @@ export function useUpdateProfile() {
       functionName: "updateProfile",
       args: args,
     });
-    return { writeContract, data, isPending };
   };
 
   return { writeContract, data, isPending };

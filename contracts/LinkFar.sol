@@ -7,9 +7,6 @@ import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/to
 import {ERC1155SupplyUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-// Uncomment this line to use console.log
-import "hardhat/console.sol";
-
 struct Profile {
     address owner;
     string uri;

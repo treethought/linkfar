@@ -2,8 +2,8 @@ import { type HardhatUserConfig, vars } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 import "@nomicfoundation/hardhat-ledger";
 
-const DEPLOYER_LEDGER_ACCOUNT = vars.get("DEPLOYER_LEDGER_ACCOUNT");
-const BASE_SEPOLIA_URL = vars.get("BASE_SEPOLIA_URL");
+const DEPLOYER_LEDGER_ACCOUNT = vars.get("DEPLOYER_LEDGER_ACCOUNT", "");
+const BASE_SEPOLIA_URL = vars.get("BASE_SEPOLIA_URL", "");
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
