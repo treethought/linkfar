@@ -313,39 +313,6 @@ export function AccountForm(props: FormProps) {
   );
 }
 
-type FarcasterDataFormProps = {
-  ctx?: FrameContext;
-};
-
-export function FarcasterDataForm(props: FarcasterDataFormProps) {
-  if (!props.ctx) return null;
-  return (
-    <>
-      <div className="flex flex-row justify-between items-center w-full">
-        <h1 className="text font-bold text-lg">Farcaster</h1>
-      </div>
-
-      {JSON.stringify(props.ctx)}
-      <div className="form-control w-full">
-        <label className="label">
-          <span className="label-text">Display Name</span>
-        </label>
-        <input
-          type="text"
-          className="input input-bordered"
-          value={props.ctx.user.displayName}
-          //onChange={(e) =>
-          //  setLocalAccountData((prev) => ({
-          //    ...prev,
-          //    name: e.target.value,
-          //  }))}
-          placeholder={props.ctx?.user.displayName || "No display name"}
-        />
-      </div>
-    </>
-  );
-}
-
 type EditLinkModalProps = {
   isOpen: boolean;
   mode: "add" | "edit";

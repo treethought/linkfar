@@ -5,6 +5,7 @@ import { createConfig, WagmiProvider } from "@privy-io/wagmi";
 
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
 import { http } from "viem";
+import farcasterFrame from "@farcaster/frame-wagmi-connector";
 
 const appUrl = process.env.NEXT_PUBLIC_URL;
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
@@ -38,6 +39,9 @@ export const config = createConfig({
     [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
+  connectors: [
+    farcasterFrame(),
+  ],
 });
 
 const queryClient = new QueryClient();
