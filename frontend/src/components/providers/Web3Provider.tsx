@@ -21,8 +21,8 @@ export const privyConfig: PrivyClientConfig = {
     },
   },
   loginMethods: ["wallet"],
-  defaultChain: baseSepolia,
-  supportedChains: [baseSepolia],
+  defaultChain: base,
+  supportedChains: [base, baseSepolia],
   appearance: {
     theme: "dark",
     showWalletLoginFirst: true,
@@ -32,7 +32,7 @@ export const privyConfig: PrivyClientConfig = {
 };
 
 export const config = createConfig({
-  chains: [baseSepolia],
+  chains: [base, baseSepolia],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),

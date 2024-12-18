@@ -6,7 +6,6 @@ import CreateAccount from "@/components/CreateAccount";
 import Account from "./Account";
 import { useProfile } from "@/hooks/profile";
 import Image from "next/image";
-import Logo from "@/components/Logo";
 
 export default function Home() {
   const { address } = useAccount();
