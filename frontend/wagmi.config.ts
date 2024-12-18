@@ -8,10 +8,10 @@ export default defineConfig({
     hardhat({
       project: "../",
       deployments: {
-        LinkFar: {
-          31337: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-          84532: "0xEAA8FabFcB5e1C1179705e780Efb796312a78100",
-          84533: "0x3190efc72afe43D5a4d4571Df3bFC5B2789f363c",
+        TransparentUpgradeableProxy: {
+          31337: "0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8",
+          84532: "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
+          84533: "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
         },
       },
     }),

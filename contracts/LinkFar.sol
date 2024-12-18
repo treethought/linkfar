@@ -6,9 +6,6 @@ import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
 import {ERC1155SupplyUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155SupplyUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
-// Uncomment this line to use console.log
 
 struct Profile {
     address owner;
@@ -19,7 +16,6 @@ struct Profile {
 contract LinkFar is
     Initializable,
     ERC1155Upgradeable,
-    OwnableUpgradeable,
     ERC1155BurnableUpgradeable,
     ERC1155SupplyUpgradeable
 {
@@ -34,22 +30,24 @@ contract LinkFar is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
-        nextProfileId = 1;
     }
 
-    function initialize(address initialOwner) public initializer {
+    function initialize() public initializer {
         __ERC1155_init("");
-        __Ownable_init(initialOwner);
         __ERC1155Burnable_init();
         __ERC1155Supply_init();
+    }
+
+    function getVersion() public pure returns (string memory) {
+        return "0.0.1";
     }
 
     function mint(string memory _uri) public returns (uint256) {
         // each address can only have one profile
         require(addrToId[msg.sender] == 0, "Profile already exists");
 
-        uint256 id = nextProfileId;
         nextProfileId += 1;
+        uint256 id = nextProfileId;
 
         Profile memory profile = Profile(msg.sender, _uri, "");
 
@@ -86,16 +84,11 @@ contract LinkFar is
     }
 
     function updateProfile(string memory _uri) public {
-        require(
-          addrToId[msg.sender] != 0,
-            "Profile does not exist"
-        );
+        require(addrToId[msg.sender] != 0, "Profile does not exist");
         uint256 id = addrToId[msg.sender];
         idProfiles[id].uri = _uri;
         emit ProfileChanged(1, msg.sender, _uri);
     }
-
-    // The following functions are overrides required by Solidity.
 
     // The following functions are overrides required by Solidity.
     function _update(

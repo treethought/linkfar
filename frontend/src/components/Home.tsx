@@ -5,6 +5,7 @@ import ConnectButton from "@/components/ConnectButton";
 import CreateAccount from "@/components/CreateAccount";
 import Account from "./Account";
 import { useProfile } from "@/hooks/profile";
+import Image from "next/image";
 
 export default function Home() {
   const { address } = useAccount();
@@ -26,7 +27,14 @@ function Landing() {
           <div className="max-w-md">
             <div className="flex flex-col items-center gap-4">
               <h1 className="text-5xl font-bold mb-2">LinkFar</h1>
-              <img src="/icon.svg" alt="LinkFar" className="w-1/2 mx-auto" />
+              <div className="relative w-1/2 aspect-[2/3] mx-auto">
+                <Image
+                  src="/icon.svg"
+                  fill
+                  className="object-contain fill-current "
+                  alt="LinkFar Logo"
+                />
+              </div>
               <p className="text-lg">
                 Bring your links to Farcaster
               </p>

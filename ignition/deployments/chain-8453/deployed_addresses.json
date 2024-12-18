@@ -1,0 +1,6 @@
+{
+  "ProxyModule#LinkFar": "0xD16F30B3e1ba9e6fa0e6849473f046E2d06B8Ef2",
+  "ProxyModule#TransparentUpgradeableProxy": "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
+  "ProxyModule#ProxyAdmin": "0xEca537925df37755845dae7DCeC85cA0DE6fE8Ee",
+  "LinkFarModule#LinkFar": "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC"
+}

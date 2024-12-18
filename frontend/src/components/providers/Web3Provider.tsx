@@ -5,6 +5,7 @@ import { createConfig, WagmiProvider } from "@privy-io/wagmi";
 
 import { PrivyClientConfig, PrivyProvider } from "@privy-io/react-auth";
 import { http } from "viem";
+import farcasterFrame from "@farcaster/frame-wagmi-connector";
 
 const appUrl = process.env.NEXT_PUBLIC_URL;
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
@@ -15,9 +16,14 @@ export const privyConfig: PrivyClientConfig = {
     requireUserPasswordOnCreate: true,
     noPromptOnSignature: false,
   },
+  externalWallets: {
+    coinbaseWallet: {
+      connectionOptions: "all",
+    },
+  },
   loginMethods: ["wallet"],
   defaultChain: base,
-  supportedChains: [hardhat, baseSepolia, base],
+  supportedChains: [base, baseSepolia],
   appearance: {
     theme: "dark",
     showWalletLoginFirst: true,
@@ -27,12 +33,15 @@ export const privyConfig: PrivyClientConfig = {
 };
 
 export const config = createConfig({
-  chains: [hardhat, baseSepolia, base],
+  chains: [base, baseSepolia],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),
     [hardhat.id]: http(),
   },
+  connectors: [
+    farcasterFrame(),
+  ],
 });
 
 const queryClient = new QueryClient();

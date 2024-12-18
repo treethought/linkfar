@@ -3,10 +3,12 @@ import { Address, zeroAddress } from "viem";
 import { useAccount, useEnsName } from "wagmi";
 import { useAccountData, useProfile } from "@/hooks/profile";
 import { AccountForm } from "./AccountForm";
+import { FrameContext } from "@farcaster/frame-sdk";
 import ProfileAvatar from "./ProfileAvatar";
 
 export type Props = {
   address?: Address;
+  ctx?: FrameContext;
 };
 
 export default function Account(props: Props) {
@@ -66,22 +68,14 @@ export default function Account(props: Props) {
     );
   }
 
-  if (!data?.properties && isOwner) {
-    return (
-      <div className="flex flex-col justify-center items-center gap-4">
-        <div className="flex flex-row justify-center items-center gap-4">
-        </div>
-        <AccountForm accountData={data} profileSlug={profile?.slug} />
-      </div>
-    );
-  }
-  if (isEditing && isOwner) {
+  if ((isEditing || !data?.properties) && isOwner) {
     return (
       <div className="flex flex-col w-full md:w-1/2 justify-center items-center gap-4 ">
         <AccountForm
           accountData={data}
           profileSlug={profile?.slug}
           onClose={() => setIsEditing(false)}
+          ctx={props.ctx}
         />
       </div>
     );
