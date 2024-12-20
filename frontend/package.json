@@ -10,7 +10,7 @@
     "wagmi:generate": "wagmi generate"
   },
   "dependencies": {
-    "@farcaster/frame-sdk": "^0.0.16",
+    "@farcaster/frame-sdk": "^0.0.20",
     "@farcaster/frame-wagmi-connector": "^0.0.1",
     "@pinata/ipfs-gateway-tools": "^1.3.0",
     "@privy-io/react-auth": "^1.97.0",

@@ -1,14 +1,16 @@
 import { useProxyAddress } from "@/hooks/contract";
+import { useInFrame } from "@/hooks/frame";
+import sdk from "@farcaster/frame-sdk";
+import farcasterFrame from "@farcaster/frame-wagmi-connector";
 import { useConnectWallet, usePrivy } from "@privy-io/react-auth";
 import * as React from "react";
-import { useChainId } from "wagmi";
+import { useChainId, useConnect } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
 
 function LoginButton() {
-  const {
-    ready,
-    authenticated,
-  } = usePrivy();
+  const { ready, authenticated } = usePrivy();
+  const { inFrame } = useInFrame();
+  const { connect } = useConnect();
 
   const { connectWallet } = useConnectWallet({
     onSuccess: (wallet) => {
@@ -22,13 +24,23 @@ function LoginButton() {
   const disableLogin = !ready || (ready && authenticated);
 
   return (
-    <button
-      className="btn btn-primary"
-      disabled={disableLogin}
-      onClick={() => connectWallet()}
-    >
-      Log in
-    </button>
+    <div className="flex flex-row gap-4">
+      <button
+        className="btn btn-primary"
+        disabled={disableLogin}
+        onClick={() => connectWallet()}
+      >
+        Log in
+      </button>
+      {inFrame && (
+        <button
+          className="btn btn-primary"
+          onClick={() => connect({ connector: farcasterFrame() })}
+        >
+          Frame Login
+        </button>
+      )}
+    </div>
   );
 }
 

@@ -8,6 +8,7 @@ import { Pencil, X } from "lucide-react";
 import { FrameContext } from "@farcaster/frame-sdk";
 import { useSetSlug, useUpdateProfile } from "@/hooks/contract";
 
+
 type FormProps = {
   profileSlug?: string;
   accountData?: AccountData;
@@ -45,6 +46,19 @@ export function AccountForm(props: FormProps) {
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [currentKey, setCurrentKey] = useState<string>("");
   const [currentValue, setCurrentValue] = useState<string>("");
+
+  const [debouncedImage, setDebouncedImage] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (localAccountData.image === debouncedImage) return;
+      setDebouncedImage(localAccountData.image || "");
+    }, 1000); // Adjust the debounce delay as needed
+
+    return () => {
+      clearTimeout(handler); // Cleanup on component unmount or value change
+    };
+  }, [localAccountData.image]);
 
   const openModal = (mode: "add" | "edit", key = "", value = "") => {
     setModalMode(mode);
@@ -172,6 +186,12 @@ export function AccountForm(props: FormProps) {
           onChange={(e) => setSlugField(e.target.value)}
           placeholder="Enter slug"
         />
+        <div className="label">
+          <span className="label-text">
+            {`https://linkfar.link/@${slug}`}
+          </span>
+        </div>
+
         <button className="btn btn-secondary mt-2" onClick={doSetSlug}>
           Set Slug
         </button>
@@ -179,6 +199,16 @@ export function AccountForm(props: FormProps) {
 
       {/* Avatar and Name Field */}
       <div className="flex flex-row justify-between items-center w-full">
+        {debouncedImage.length > 8 && (
+          <div className="avatar">
+            <div className={`w-12 rounded-full`}>
+              <img
+                src={debouncedImage}
+                className="rounded-full w-64"
+              />
+            </div>
+          </div>
+        )}
         <div className="form-control w-1/2">
           <label className="label">
             <span className="label-text">Avatar</span>

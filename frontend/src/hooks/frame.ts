@@ -7,8 +7,8 @@ export function useFrameContext() {
 
   useEffect(() => {
     const load = async () => {
-      setContext(await sdk.context);
       sdk.actions.ready();
+      setContext(await sdk.context);
     };
     if (sdk && !isLoaded) {
       setLoaded(true);

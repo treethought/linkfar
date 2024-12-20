@@ -3,7 +3,6 @@
 import ChainSwitcher from "@/components/ChainSwitcher";
 import ConnectButton from "@/components/ConnectButton";
 import ThemeController from "@/components/ThemeController";
-import { useFrameContext } from "@/hooks/frame";
 import dynamic from "next/dynamic";
 import { useAccount } from "wagmi";
 
@@ -13,16 +12,19 @@ const Home = dynamic(() => import("@/components/Home"), {
 
 export function NavBar() {
   const { isConnected } = useAccount();
+
   return (
-    <div className="flex flex-row w-full justify-between items-center gap-4 px-2">
-      <h1 className="text-2xl font-bold text-center mb-4 primary-content">
-        LinkFar
-      </h1>
+    <div className="flex flex-row w-full justify-between items-center gap-4 mx-2">
+      <div className="flex flex-row items-center gap-4">
+        <h1 className="text-2xl font-bold text-center mb-4 primary-content">
+          LinkFar
+        </h1>
+      </div>
       <div className="flex flex-row items-center gap-4">
         <ChainSwitcher />
         <ThemeController />
         {isConnected && (
-          <div className="mb-4 ">
+          <div className="mb-4">
             <ConnectButton />
           </div>
         )}
@@ -32,10 +34,9 @@ export function NavBar() {
 }
 
 export default function App() {
-  const {} = useFrameContext();
   return (
-    <main className="min-h-screen flex flex-col p-4">
-      <div className="w-full h-screen mx-auto py-4 px-1">
+    <main className="min-h-screen w-full flex flex-col m-4 mx-auto">
+      <div className="w-full h-screen mx-auto py-2 px-1">
         <div className="flex flex-col items-center gap-4 w-full">
           <NavBar />
           <Home />
