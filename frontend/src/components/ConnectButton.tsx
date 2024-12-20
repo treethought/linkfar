@@ -61,6 +61,7 @@ export function AccountOptions() {
   const { data: ensName } = useEnsName({ address, chainId: 1 });
   const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
   const proxyAddress = useProxyAddress();
+  const { inFrame } = useInFrame();
 
   const disconnectAndLogout = async () => {
     await logout();
@@ -107,6 +108,16 @@ export function AccountOptions() {
               Chain ID: <pre>{JSON.stringify(chainId)}</pre>
             </span>
           </li>
+          <li>
+            {!inFrame && (
+              <button
+                onClick={() => sdk.actions.addFrame()}
+              >
+                Add Frame
+              </button>
+            )}
+          </li>
+
           <li>
             <button onClick={() => disconnectAndLogout()}>Disconnect</button>
           </li>

@@ -7,7 +7,7 @@ export default function CreateAccount() {
 
   return (
     <button className="btn" onClick={() => createAccount()}>
-      {isConnected ? "Create Account" : "Connect to create Account"}
+      {isConnected ? "Mint Account" : "Connect to create Account"}
     </button>
   );
 }

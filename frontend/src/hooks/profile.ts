@@ -25,8 +25,6 @@ export type AccountData = {
   image?: string;
   properties?: Record<string, string>;
 
-  // not in ERC-1155 metadata
-  farcaster?: FarcasterUserData;
 };
 
 export function useProfileBySlug(slug: string) {
