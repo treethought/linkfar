@@ -8,6 +8,7 @@ import { useProfile } from "@/hooks/profile";
 import Image from "next/image";
 import { useInFrame } from "@/hooks/frame";
 import sdk from "@farcaster/frame-sdk";
+import IconSVG from "../assets/icon.svg";
 
 export default function Home() {
   const { address } = useAccount();
@@ -29,13 +30,9 @@ function Landing() {
         <div className="max-w-md">
           <div className="flex flex-col items-center gap-4">
             <h1 className="text-5xl font-bold mb-2">LinkFar</h1>
-            <div className="relative w-1/2 aspect-[2/3] mx-auto">
-              <Image
-                src="/icon.svg"
-                fill
-                className="object-contain fill-current "
-                alt="LinkFar Logo"
-              />
+
+            <div className="w-1/2 aspect-[2/3] mx-auto text-primary-accent">
+              <IconSVG className="w-full h-full fill-current" />
             </div>
 
             {inFrame && (

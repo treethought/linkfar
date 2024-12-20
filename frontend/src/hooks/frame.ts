@@ -14,7 +14,7 @@ export function useFrameContext() {
       setLoaded(true);
       load();
     }
-  }, [isLoaded]);
+  }, [isLoaded, sdk]);
   return { context };
 }
 

@@ -109,7 +109,7 @@ export function AccountOptions() {
             </span>
           </li>
           <li>
-            {!inFrame && (
+            {inFrame && (
               <button
                 onClick={() => sdk.actions.addFrame()}
               >
