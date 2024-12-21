@@ -3,7 +3,6 @@ import { getAddress, zeroAddress } from "viem";
 import { useEnsAvatar, useEnsName, useReadContract } from "wagmi";
 import { getCIDJson } from "@/lib/ipfs";
 import { linkFarAbi } from "@/generated";
-import Profile from "@/app/[slug]/page";
 import { useProxyAddress } from "./contract";
 
 export interface Profile {
@@ -24,7 +23,6 @@ export type AccountData = {
   description?: string;
   image?: string;
   properties?: Record<string, string>;
-
 };
 
 export function useProfileBySlug(slug: string) {
@@ -99,12 +97,16 @@ export function useAccountAvatar(address: string) {
   const { data: ensAvatar } = useEnsAvatar({ name: ensName!, chainId: 1 });
   const { data, loading, error } = useAccountData(address);
 
+  if (!address) {
+    return { avatar: undefined, loading: false, error: undefined };
+  }
+
   if (data?.image) {
     return { avatar: data.image, loading, error };
   }
-  if (data?.farcaster?.pfpUrl) {
-    return { avatar: data.farcaster.pfpUrl, loading, error };
-  }
+  //if (data?.farcaster?.pfpUrl) {
+  //  return { avatar: data.farcaster.pfpUrl, loading, error };
+  //}
 
   if (ensAvatar) {
     return { avatar: ensAvatar, loading, error };

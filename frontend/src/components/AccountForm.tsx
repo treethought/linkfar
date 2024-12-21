@@ -8,7 +8,6 @@ import { Pencil, X } from "lucide-react";
 import { FrameContext } from "@farcaster/frame-sdk";
 import { useSetSlug, useUpdateProfile } from "@/hooks/contract";
 
-
 type FormProps = {
   profileSlug?: string;
   accountData?: AccountData;
@@ -34,10 +33,17 @@ export function AccountForm(props: FormProps) {
     confirmations: 1,
   });
 
+  const fcLinks: Record<string, string> = props.ctx?.user
+    ? {
+      "Farcaster": `https://warpcast.com/${props.ctx?.user?.username}`,
+    }
+    : {};
+
   const [localAccountData, setLocalAccountData] = useState<AccountData>({
-    name: props.accountData?.name || "",
+    name: props.accountData?.name || props.ctx?.user.displayName || "",
+    image: props.accountData?.image || props.ctx?.user.pfpUrl || "",
     description: props.accountData?.description || "",
-    properties: props.accountData?.properties || {},
+    properties: props.accountData?.properties || fcLinks || {},
   });
 
   const [slug, setSlugField] = useState<string>(props.profileSlug || "");

@@ -1,15 +1,13 @@
-import { useAccountAvatar } from "@/hooks/profile";
 import Link from "next/link";
 
 type Props = {
-  address?: string;
+  src?: string;
   link?: string;
   className?: string;
 };
 
-export default function ProfileAvatar(props: Props) {
-  const { avatar } = useAccountAvatar(props.address!);
-  if (!avatar) {
+export default function Avatar(props: Props) {
+  if (!props.src) {
     return null;
   }
   return (
@@ -19,7 +17,7 @@ export default function ProfileAvatar(props: Props) {
           ? (
             <Link href={props.link} passHref>
               <img
-                src={avatar}
+                src={props.src}
                 alt={"pfp"}
                 className="rounded-full"
               />
@@ -27,7 +25,7 @@ export default function ProfileAvatar(props: Props) {
           )
           : (
             <img
-              src={avatar}
+              src={props.src}
               alt={"pfp"}
               className="rounded-full"
             />

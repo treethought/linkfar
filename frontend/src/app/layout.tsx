@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import NavBar from "@/components/Navbar";
+import { useInFrame } from "@/hooks/frame";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <Providers>
           <NavBar />
-          {children}
+          <div className="flex-col items-center mx-auto">
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

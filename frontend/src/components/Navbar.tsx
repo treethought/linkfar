@@ -1,14 +1,17 @@
 "use client";
-import ChainSwitcher from "@/components/ChainSwitcher";
 import ConnectButton from "@/components/ConnectButton";
 import ThemeController from "@/components/ThemeController";
 import { useAccount } from "wagmi";
-import Image from "next/image";
 import Link from "next/link";
 import IconSVG from "../assets/icon.svg";
+import { BookmarkPlus } from "lucide-react";
+import { useFrameContext, useInFrame } from "@/hooks/frame";
+import sdk from "@farcaster/frame-sdk";
 
 export default function NavBar() {
   const { isConnected } = useAccount();
+  const { inFrame } = useInFrame();
+  const { context } = useFrameContext();
   return (
     <div className="flex flex-row w-full justify-between items-center gap-4 py-2">
       {/* Logo and Text as Link */}
@@ -32,6 +35,16 @@ export default function NavBar() {
           </div>
         )}
       </div>
+      {inFrame && !context?.client.added && (
+        <div className="fixed bottom-5 right-5">
+          <button
+            className="btn btn-accent btn-circle shadow-lg"
+            onClick={() => sdk.actions.addFrame()}
+          >
+            <BookmarkPlus size={24} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
