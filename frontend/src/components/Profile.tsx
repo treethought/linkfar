@@ -24,7 +24,16 @@ export default function Profile(props: Props) {
   if (isLoading || dataLoading) {
     return <div className="loading loading-bars" />;
   }
-  if (isEditing) {
+  if (!isLoading && (!hasProfile)) {
+    return (
+      <div className="flex flex-col justify-center items-center gap-4">
+        <div className="flex flex-row justify-center items-center gap-4">
+          <h1>Account Not Found</h1>
+        </div>
+      </div>
+    );
+  }
+  if (isEditing || (hasProfile && profile.uri === "")) {
     return (
       <div className="flex flex-col w-full md:w-1/2 mx-auto justify-center items-center gap-4 border ">
         <AccountForm
@@ -35,18 +44,10 @@ export default function Profile(props: Props) {
       </div>
     );
   }
-  if (!isLoading && (!hasProfile || !data)) {
-    return (
-      <div className="flex flex-col justify-center items-center gap-4">
-        <div className="flex flex-row justify-center items-center gap-4">
-          <h1>Account Not Found</h1>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col w-full md:w-1/2 mx-auto justify-center items-center gap-4 border ">
+      {(isLoading || dataLoading) && <div className="loading loading-lg" />}
       <AccountView accountData={data!} profile={profile} />
       {isOwner && (
         <button

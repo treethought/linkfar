@@ -6,7 +6,6 @@ import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-
 struct Profile {
     address owner;
     string uri;
@@ -20,6 +19,8 @@ contract LinkFar is
 {
     uint256 private currentId;
     uint256 private supply;
+    string private _name;
+    string private metadataURI;
     mapping(uint256 => Profile) private idProfiles;
     mapping(address => uint256) private addrToId;
     mapping(string => uint256) private slugToId;
@@ -42,10 +43,20 @@ contract LinkFar is
         // so the storage persists
         currentId = 1;
         supply = 0;
+        _name = "LinkFar";
+        metadataURI = "ipfs://bafkreihw6snpq5f3qynocim47yuvpqq7xnlaptfisv6m3zsyhkdviwo6n4";
+    }
+
+    function name() public view returns (string memory) {
+        return _name;
     }
 
     function getVersion() public pure returns (string memory) {
         return "0.0.1";
+    }
+
+    function contractURI() public view returns (string memory) {
+        return metadataURI;
     }
 
     function totalMinted() public view returns (uint256) {
