@@ -16,7 +16,7 @@ describe("Proxy", function() {
         { client: { wallet: otherAccount } },
       );
       expect(await linkFarAsOtherAccount.read.getVersion()).to.equal("0.0.1");
+      expect(await linkFarAsOtherAccount.read.totalSupply()).to.equal(0n);
     });
   });
-});
 });

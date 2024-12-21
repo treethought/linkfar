@@ -4,7 +4,7 @@ import { useInFrame } from "@/hooks/frame";
 import sdk from "@farcaster/frame-sdk";
 import { useConnectWallet, usePrivy } from "@privy-io/react-auth";
 import * as React from "react";
-import { useChainId, useConnect } from "wagmi";
+import { useChainId } from "wagmi";
 import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from "wagmi";
 
 type Props = {

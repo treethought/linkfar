@@ -8,10 +8,12 @@ export const proxyModule = buildModule("ProxyModule", (m) => {
 
   const linkFar = m.contract("LinkFar", [], {});
 
+  const initialize = m.encodeFunctionCall(linkFar, "initialize", []);
+
   const proxy = m.contract("TransparentUpgradeableProxy", [
-    linkFar,
-    proxyAdminOwner,
-    "0x", // initialize args
+    linkFar, // Implementation address
+    proxyAdminOwner, // Proxy admin
+    initialize, // Encoded initializer
   ]);
 
   const proxyAdminAddress = m.readEventArgument(

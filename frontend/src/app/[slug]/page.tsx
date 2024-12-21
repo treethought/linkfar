@@ -9,7 +9,7 @@ export default function SlugProfile({
   params: Promise<{ slug: string }>;
 }) {
   const [slug, setSlug] = useState<string | null>(null);
-  const { profile} = useProfileBySlug(slug || "");
+  const { profile } = useProfileBySlug(slug || "");
 
   useEffect(() => {
     console.log("params", params);
