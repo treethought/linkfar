@@ -10,8 +10,8 @@ export default defineConfig({
       deployments: {
         TransparentUpgradeableProxy: {
           31337: "0x8A93d247134d91e0de6f96547cB0204e5BE8e5D8",
-          84532: "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
-          8453: "0x6367C37ABCb4726561E51c8eF1cE78A400badAdC",
+          84532: "0x2Feae953d2e431487aa577F3704c40C41e6d9F49",
+          8453: "0x2Feae953d2e431487aa577F3704c40C41e6d9F49",
         },
       },
     }),
